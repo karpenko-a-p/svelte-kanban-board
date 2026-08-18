@@ -1,0 +1,40 @@
+@layer components {
+  .input {
+    @apply flex flex-col;
+  }
+
+  .input > label {
+    @apply flex flex-col relative
+  }
+
+  .input > label > span {
+    @apply text-black text-xs absolute left-2 top-3 translate-y-[-50%] z-1 border-l
+    border-transparent truncate max-w-[calc(100%-1rem)];
+  }
+
+  .input > label:has(:required) > span:after {
+    @apply content-['*'] text-red-500 ml-0.5;
+  }
+
+  .input > label:has(:disabled) {
+    @apply select-none cursor-not-allowed pointer-events-none;
+  }
+
+  .input:has(input:disabled) {
+    @apply cursor-not-allowed;
+  }
+
+  .input input {
+    @apply rounded-xl px-2 pb-1.5 pt-5 transition-all font-normal bg-gray-100
+    outline-2 focus:outline-2 focus:outline-blue-500 outline-transparent placeholder:text-gray-300
+    disabled:bg-gray-200 disabled:text-gray-600 not-disabled:not-focus:aria-invalid:outline-red-500;
+  }
+
+  .input-description {
+    @apply text-xs text-gray-400 mt-0.5;
+  }
+
+  .input-error {
+    @apply text-xs text-red-500 mt-0.5;
+  }
+}

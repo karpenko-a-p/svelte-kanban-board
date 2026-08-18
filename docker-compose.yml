@@ -1,0 +1,141 @@
+services:
+  postgres:
+    image: postgres:17.5-alpine3.22
+    container_name: postgres-database
+    restart: unless-stopped
+    networks:
+      - local
+    volumes:
+      - database-storage:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: admin
+      POSTGRES_DB: main
+      PGDATA: /var/lib/postgresql/data/pgdata
+      PGTZ: Europe/Moscow
+      TZ: Europe/Moscow
+    healthcheck:
+      test: pg_isready -U admin -d database
+      interval: 15s
+      timeout: 10s
+      retries: 3
+
+  migrations:
+    image: amacneil/dbmate:2.29.5
+    container_name: dbmate-migrations
+    restart: no
+    networks:
+      - local
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./db/migrations:/db/migrations:ro
+    environment:
+      DATABASE_URL: postgresql://admin:password@postgres:5432/main?sslmode=disable
+    command: --wait up
+
+  redis:
+    image: redis:7.4.7-alpine3.21
+    container_name: redis-cache
+    restart: unless-stopped
+    networks:
+      - local
+    healthcheck:
+      test: redis-cli ping
+      interval: 15s
+      timeout: 10s
+      retries: 3
+
+  application:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: svelte-application
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    networks:
+      - local
+    volumes:
+      - ./logs.db:/app/logs.db
+      - ./media-storage:/app/media-storage
+    environment:
+      # Token Service
+      JWT_SECRET: my-super-puper-duper-secret-key-for-my-jwt-token
+      # Storage Service
+      MAX_IMAGE_SIZE_IN_BYTES: 1048576 #1Mb
+      MAX_VIDEO_SIZE_IN_BYTES: 52428800 #50Mb
+      # File Service
+      MAX_IMAGE_CORNER_IN_PX: 6124 #pixels
+      MIN_IMAGE_CORNER_IN_PX: 400 #pixels
+      MAX_IMAGE_PREFERRED_CORNER_IN_PX: 1200 #pixels
+      MIN_MINIFIED_IMAGE_PREFERRED_CORNER_IN_PX: 300 #pixels
+      MAX_IMAGE_RATION: 2.5 #ration
+      IMAGE_QUALITY: 85 #percent
+      # Scheduler
+      ENABLE_SCHEDULING: true
+      # Connection strings
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://admin:password@postgres:5432/main?sslmode=disable
+      SQLITE_URL: sqlite://logs.db
+      # Internal system
+      BODY_SIZE_LIMIT: 51M
+      PORT: 3000
+      TZ: Europe/Moscow
+    healthcheck:
+      test: wget -q --spider http://127.0.0.1:3000/api/v1/health
+      interval: 15s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:1.29.4-alpine3.23-slim
+    container_name: nginx
+    restart: unless-stopped
+    depends_on:
+      application:
+        condition: service_healthy
+    ports:
+      - "443:443"
+    networks:
+      - local
+    volumes:
+      - ./media-storage:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/ssl:ro
+    healthcheck:
+      test: wget --no-check-certificate -q --spider https://127.0.0.1/health
+      interval: 15s
+      timeout: 10s
+      retries: 3
+
+  autohill:
+    image: willfarrell/autoheal:latest
+    container_name: autoheal
+    restart: unless-stopped
+    depends_on:
+      nginx:
+        condition: service_healthy
+    networks:
+      - local
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: all
+      AUTOHEAL_INTERVAL: 30
+      AUTOHEAL_START_PERIOD: 60
+      AUTOHEAL_DEFAULT_STOP_TIMEOUT: 10
+      CURL_TIMEOUT: 30
+
+volumes:
+  database-storage:
+
+networks:
+  local:
+    driver: bridge

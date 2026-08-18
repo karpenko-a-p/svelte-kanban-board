@@ -1,0 +1,17 @@
+@layer components {
+  p {
+    @apply text-base text-black max-mobile:text-sm ease-in-out transition-all;
+  }
+
+  p.small {
+    @apply text-sm max-mobile:text-xs;
+  }
+
+  p.secondary {
+    @apply text-gray-400;
+  }
+
+  p > strong {
+    @apply font-bold;
+  }
+}
