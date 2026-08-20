@@ -2,7 +2,7 @@
  * Токен для хранения данных
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export class Token<T> {
+class Token<T> {
   /**
    * Создание токена
    * @param id - идентификатор для проверки
@@ -37,13 +37,18 @@ function set<T>(token: Token<T>, value: T): void {
 }
 
 /**
- * Создание токена
+ * Регистрация в контейнере
+ * @param tokenId - идентификатор для токена
+ * @param value - хранимое значение
+ * @returns токен привязанный к сущности
  */
-function token<T>(tokenId: string): Token<T> {
-  return new Token<T>(tokenId);
+function register<T>(tokenId: string, value: T): Token<T> {
+  const token = new Token<T>(tokenId);
+  set(token, value);
+  return token;
 }
 
 /**
  * DI-Контейнер для хранения и подстановки сущностей
  */
-export const diContainer = { get, set, token };
+export const diContainer = { get, set, register };

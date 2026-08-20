@@ -54,7 +54,8 @@
   },
   "dependencies": {
     "@tabler/icons-svelte": "3.44.0",
-    "dayjs": "1.11.21"
+    "dayjs": "1.11.23",
+    "jose": "6.2.9"
   },
   "browserslist": [
     "last 15 versions",

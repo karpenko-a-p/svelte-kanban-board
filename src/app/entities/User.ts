@@ -1,9 +1,9 @@
-import { isDate, isRecord, isString } from '@app/core/common';
+import { isDate, isRecord, isString, type ToPojo } from '@app/core/common';
 
 /**
  * Пользователь системы
  */
-export class User {
+export class User implements ToPojo {
   /**
    * Создание сущности пользователя
    * @param id - идентификатор
@@ -29,7 +29,7 @@ export class User {
         isString(entity.id) &&
         isString(entity.login) &&
         isString(entity.login) &&
-        isString(entity.createAt))
+        isDate(entity.createAt))
     );
   }
 
@@ -64,5 +64,17 @@ export class User {
     if (User.isExtends(entity)) {
       return new User(entity.id, entity.login, entity.fio, entity.createdAt);
     }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  toPojo(): Record<string, unknown> {
+    return {
+      id: this.id,
+      login: this.login,
+      fio: this.fio,
+      createdAt: this.createdAt
+    };
   }
 }

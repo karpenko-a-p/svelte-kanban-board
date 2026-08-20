@@ -1,7 +1,7 @@
 import { diContainer } from '@app/core/common';
 import { User } from '@app/entities';
 import type { DbUser } from '@app/repos/db-entities';
-import { postgres, REDIS_HOUR, redisSet } from '@app/repos/utils';
+import { postgres, REDIS_HOUR, redisGet, redisSet } from '@app/repos/utils';
 
 /**
  * Репозиторий для работы с пользователями
@@ -68,16 +68,27 @@ class UserRepoImpl implements UserRepo {
    * @inheritDoc
    */
   async getUserById(id: string): Promise<Maybe<User>> {
+    const cacheKey = `user:${id}`;
+    const cachedUser = await redisGet<User>(cacheKey);
+
+    if (cachedUser !== undefined) {
+      return cachedUser && User.tryParse(cachedUser);
+    }
+
     const [row = null] = await postgres<[DbUser]>`
       select id, login, fio, created_at
       from users
       where id = ${id}
       limit 1`;
 
-    return row && User.new(row.id, row.login, row.fio, row.created_at);
+    const user = row && User.new(row.id, row.login, row.fio, row.created_at);
+
+    redisSet(cacheKey, REDIS_HOUR, user);
+    return user;
   }
 }
 
-export const USER_REPO = diContainer.token('USER_REPO');
-
-diContainer.set(USER_REPO, new UserRepoImpl());
+/**
+ * Регистрация в DI
+ */
+export const USER_REPO = diContainer.register(UserRepoImpl.name, new UserRepoImpl());

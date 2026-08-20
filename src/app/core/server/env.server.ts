@@ -9,6 +9,11 @@ export const DEV = import.meta.env.DEV;
 export const PROD = import.meta.env.PROD;
 
 /**
+ * Секретный ключ для генерации токена
+ */
+export const JWT_SECRET = process.env.JWT_SECRET;
+
+/**
  * Бэк url
  */
 export const DATABASE_URL = process.env.DATABASE_URL;

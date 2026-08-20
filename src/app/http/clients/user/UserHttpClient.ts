@@ -5,6 +5,7 @@ import { BAD_REQUEST, CREATED, LOGIN_EXISTS } from '@app/http/constants';
 import { ReqHeaders } from '@app/http/utils';
 
 import { type RegisterErr, RegisterLoginExistsErr, RegisterServerErr, RegisterValidationErr } from './RegisterErr';
+import { RegisterUserDto } from './RegisterUserDto';
 import { UserDto } from './UserDto';
 
 /**
@@ -14,9 +15,10 @@ export interface UserHttpClient {
   /**
    * Регистрация пользователя
    * @param login - логин нового пользователя
+   * @param fio - ФИО нового пользователя
    * @param password - пароль нового пользователя
    */
-  register(login: string, password: string): Promise<Res<User, RegisterErr>>;
+  register(login: string, fio: string, password: string): Promise<Res<User, RegisterErr>>;
 }
 
 /**
@@ -26,11 +28,11 @@ class UserHttpClientImpl implements UserHttpClient {
   /**
    * @inheritDoc
    */
-  async register(login: string, password: string): Promise<Res<User, RegisterErr>> {
+  async register(login: string, fio: string, password: string): Promise<Res<User, RegisterErr>> {
     const response = await fetch('/api/v1/auth/register', {
       method: 'POST',
       headers: ReqHeaders.default().build(),
-      body: JSON.stringify({ login, password })
+      body: JSON.stringify(RegisterUserDto.new(login, fio, password))
     });
 
     // Пользователь зарегистрирован
@@ -65,6 +67,7 @@ class UserHttpClientImpl implements UserHttpClient {
   }
 }
 
-export const USER_HTTP_CLIENT = diContainer.token('USER_HTTP_CLIENT');
-
-diContainer.set(USER_HTTP_CLIENT, new UserHttpClientImpl());
+/**
+ * Регистрация в DI
+ */
+export const USER_HTTP_CLIENT = diContainer.register<UserHttpClient>(UserHttpClientImpl.name, new UserHttpClientImpl());

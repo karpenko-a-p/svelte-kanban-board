@@ -40,6 +40,10 @@ class PasswordServiceImpl implements PasswordService {
   }
 }
 
-const PASSWORD_SERVICE = diContainer.token('PASSWORD_SERVICE');
-
-diContainer.set(PASSWORD_SERVICE, new PasswordServiceImpl());
+/**
+ * Регистрация в DI
+ */
+export const PASSWORD_SERVICE = diContainer.register<PasswordService>(
+  PasswordServiceImpl.name,
+  new PasswordServiceImpl()
+);

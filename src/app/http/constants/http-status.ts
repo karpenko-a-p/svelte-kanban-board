@@ -24,6 +24,11 @@ export const UNAUTHORIZED = 401;
 export const FORBIDDEN = 403;
 
 /**
+ * Некорректный тип данных
+ */
+export const UNPROCESSABLE_ENTITY = 422;
+
+/**
  * Внутренняя ошибка сервера
  */
 export const INTERNAL_SERVER_ERROR = 500;

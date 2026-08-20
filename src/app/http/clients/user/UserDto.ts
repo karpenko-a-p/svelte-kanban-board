@@ -31,6 +31,14 @@ export class UserDto {
   }
 
   /**
+   * Парсинг сущности пользователя к DTO пользователя
+   * @param user - сущность пользователя
+   */
+  static fromUser(user: User): UserDto {
+    return new UserDto(user.id, user.login, user.fio, user.createdAt.toISOString());
+  }
+
+  /**
    * Приведение DTO к сущности пользователя
    * @returns сущность пользователя
    */
