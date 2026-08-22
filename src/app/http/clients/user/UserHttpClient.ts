@@ -1,10 +1,12 @@
 import { diContainer, err, ok, type Res } from '@app/core/common';
 import type { User } from '@app/entities';
-import { ErrorDto, ValidationErrorDto } from '@app/http/common-dtos';
-import { BAD_REQUEST, CREATED, LOGIN_EXISTS } from '@app/http/constants';
-import { ReqHeaders } from '@app/http/utils';
+import { ErrorDto, InvalidEntityErrorDto, ValidationErrorDto } from '@app/http/common-dtos';
+import { type BackErr, type HttpErr, InvalidEntityErr, NetworkErr } from '@app/http/common-errors';
+import { RegisterValidationErr, ServerErr } from '@app/http/common-errors';
+import { LOGIN_EXISTS } from '@app/http/constants';
+import { ReqHeaders, request } from '@app/http/utils';
 
-import { type RegisterErr, RegisterLoginExistsErr, RegisterServerErr, RegisterValidationErr } from './RegisterErr';
+import { type RegisterErr, RegisterLoginExistsErr } from './RegisterErr';
 import { RegisterUserDto } from './RegisterUserDto';
 import { UserDto } from './UserDto';
 
@@ -18,7 +20,7 @@ export interface UserHttpClient {
    * @param fio - ФИО нового пользователя
    * @param password - пароль нового пользователя
    */
-  register(login: string, fio: string, password: string): Promise<Res<User, RegisterErr>>;
+  register(login: string, fio: string, password: string): Promise<Res<User, RegisterErr | BackErr | HttpErr>>;
 }
 
 /**
@@ -28,42 +30,52 @@ class UserHttpClientImpl implements UserHttpClient {
   /**
    * @inheritDoc
    */
-  async register(login: string, fio: string, password: string): Promise<Res<User, RegisterErr>> {
-    const response = await fetch('/api/v1/auth/register', {
+  async register(login: string, fio: string, password: string): Promise<Res<User, RegisterErr | BackErr | HttpErr>> {
+    const response = await request('/api/v1/auth/register', {
       method: 'POST',
       headers: ReqHeaders.default().build(),
       body: JSON.stringify(RegisterUserDto.new(login, fio, password))
     });
 
+    // Ошибка сети
+    if (response.isErr()) {
+      return err(new NetworkErr());
+    }
+
+    const smartResponse = response.unwrap();
+
     // Пользователь зарегистрирован
-    if (response.status === CREATED) {
-      const userDto = UserDto.tryParse(await response.json().catch(() => null));
+    if (smartResponse.isCreated) {
+      const userDto = UserDto.tryParse(await smartResponse.json());
 
       // Некорректный ответ от бэка
-      if (!userDto) {
-        return err(new RegisterServerErr());
+      if (userDto) {
+        return ok(userDto.toUser());
       }
+    }
 
-      return ok(userDto.toUser());
+    // Передано некорректное DTO
+    else if (smartResponse.isUnprocessableEntity && InvalidEntityErrorDto.isExtends(await smartResponse.json())) {
+      return err(new InvalidEntityErr());
     }
 
     // Ошибка с клиентской стороны
-    if (response.status === BAD_REQUEST) {
-      const resDto = await response.json();
+    else if (smartResponse.isBadRequest) {
+      const responseDto = await smartResponse.json();
 
       // Ошибка валидации, некорректные данные
-      if (ValidationErrorDto.isExtends(resDto)) {
-        return err(new RegisterValidationErr(resDto.mistakes));
+      if (ValidationErrorDto.isExtends(responseDto)) {
+        return err(new RegisterValidationErr(responseDto.mistakes));
       }
 
       // Пользователь с таким логином уже существует или неизвестная ошибка
-      return ErrorDto.isExtends(resDto) && resDto.code === LOGIN_EXISTS
-        ? err(new RegisterLoginExistsErr())
-        : err(new RegisterServerErr());
+      if (ErrorDto.isExtends(responseDto) && responseDto.code === LOGIN_EXISTS) {
+        return err(new RegisterLoginExistsErr());
+      }
     }
 
     // Неизвестная ошибка
-    return err(new RegisterServerErr());
+    return err(new ServerErr());
   }
 }
 

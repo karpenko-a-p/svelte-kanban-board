@@ -3,6 +3,7 @@ import { DEV } from '@app/core/server';
 import { RegisterUserDto, UserDto } from '@app/http/clients/user';
 import { ErrorDto, InvalidEntityErrorDto, ServerErrorDto, ValidationErrorDto } from '@app/http/common-dtos';
 import { BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, LOGIN_EXISTS, UNPROCESSABLE_ENTITY } from '@app/http/constants';
+import { parseJson } from '@app/http/utils';
 import { USER_REPO } from '@app/repos';
 import { PASSWORD_SERVICE, TOKEN_SERVICE } from '@app/services/server';
 import { json, type RequestHandler } from '@sveltejs/kit';
@@ -16,7 +17,7 @@ const passwordService = diContainer.get(PASSWORD_SERVICE);
  */
 export const POST: RequestHandler = async ({ request, cookies }) => {
   try {
-    const dto = RegisterUserDto.tryParse(await request.json());
+    const dto = RegisterUserDto.tryParse(await parseJson(request));
 
     // Передан некорректный тип данных
     if (!dto) {

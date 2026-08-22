@@ -1,25 +1,11 @@
+import { Locker } from '@app/core/common';
+
 /**
  * Причина ошибки при создании пользователя
  */
-export interface RegisterErr {}
-
-/**
- * Ошибка валидации
- */
-export class RegisterValidationErr implements RegisterErr {
-  /**
-   * Создание причины ошибки из-за валидации
-   * @param errors - список ошибок валидации
-   */
-  constructor(readonly errors: string[]) {}
-}
+export abstract class RegisterErr extends Locker<'RegisterErr'> {}
 
 /**
  * Логин уже используется
  */
-export class RegisterLoginExistsErr implements RegisterErr {}
-
-/**
- * Внутренняя ошибка сервера
- */
-export class RegisterServerErr implements RegisterErr {}
+export class RegisterLoginExistsErr extends RegisterErr {}

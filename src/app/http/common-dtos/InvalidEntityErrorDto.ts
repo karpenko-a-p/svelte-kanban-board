@@ -15,6 +15,14 @@ export class InvalidEntityErrorDto extends ErrorDto {
   }
 
   /**
+   * Проверка, что сущность расширяет тип InvalidEntityErrorDto
+   * @param dto - проверяемая сущность
+   */
+  static isExtends(dto: unknown): dto is MoreThan<InvalidEntityErrorDto> {
+    return ErrorDto.isExtends(dto) && dto.code === INVALID_ENTITY;
+  }
+
+  /**
    * Парсинг сущности к dto
    * @param dto - приводимая сущность
    */
