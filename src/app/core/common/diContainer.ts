@@ -1,13 +1,20 @@
 /**
  * Токен для хранения данных
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class Token<T> {
   /**
    * Создание токена
    * @param id - идентификатор для проверки
    */
   constructor(readonly id: string) {}
+
+  /**
+   * Получение из контейнера
+   * @returns данные хранящиеся в контейнере
+   */
+  get(): T {
+    return get(this);
+  }
 }
 
 /**

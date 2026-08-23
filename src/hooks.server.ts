@@ -1,3 +1,4 @@
+import { ServerErrorDto } from '@app/http/common-dtos';
 import type { HandleServerError, ServerInit } from '@sveltejs/kit';
 
 /**
@@ -19,4 +20,6 @@ export const handleError: HandleServerError = ({ error, event }) => {
     #4 Адресс: ${event.getClientAddress()}
     #5 Куки ${JSON.stringify(event.cookies.getAll())}
     #6 Хедеры ${JSON.stringify(event.request.headers.entries())}`);
+
+  return new ServerErrorDto();
 };

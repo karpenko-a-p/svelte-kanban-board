@@ -52,7 +52,7 @@ export class RegisterUserDto implements Validate {
       errors.push('ФИО должно быть от 6 до 32 символов включительно');
     }
 
-    if (this.fio.length < 6 || this.fio.length > 128) {
+    if (this.password.length < 6 || this.password.length > 128) {
       errors.push('Пароль доложен быть от 6 до 32 символов включительно');
     }
 

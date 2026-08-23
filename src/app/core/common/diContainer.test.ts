@@ -9,6 +9,16 @@ describe('diContainer', () => {
     expect(token.id).toBe(tokenId);
   });
 
+  test('Получение из контейнера', () => {
+    const someValue = { some: 'value' };
+    const token = diContainer.register('', someValue);
+
+    expect(token.get()).toBe(diContainer.get(token));
+    expect(token.get()).toEqual(diContainer.get(token));
+    expect(token.get()).toBe(someValue);
+    expect(token.get()).toEqual(someValue);
+  });
+
   test('Регистрация и повторная установка в контейнер', () => {
     //  Регистрация
     const someValue = { some: 'object' };

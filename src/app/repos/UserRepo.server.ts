@@ -26,6 +26,18 @@ export interface UserRepo {
    * @param id - идентификатор пользователя
    */
   getUserById(id: string): Promise<Maybe<User>>;
+
+  /**
+   * Получение пользователя по логину
+   * @param login - логин пользователя
+   */
+  getUserByLogin(login: string): Promise<Maybe<User>>;
+
+  /**
+   * Получение пароля пользователя по его идентификатору
+   * @param login - логин пользователя
+   */
+  getUserPasswordByLogin(login: string): Promise<Maybe<string>>;
 }
 
 /**
@@ -85,6 +97,36 @@ class UserRepoImpl implements UserRepo {
 
     redisSet(cacheKey, REDIS_HOUR, user);
     return user;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  async getUserByLogin(login: string): Promise<Maybe<User>> {
+    const [row = null] = await postgres<[DbUser]>`
+      select id, login, fio, created_at
+      from users
+      where login = ${login}
+      limit 1`;
+
+    const user = row && User.new(row.id, row.login, row.fio, row.created_at);
+
+    user && redisSet(`user:${user.id}`, REDIS_HOUR, user);
+
+    return user;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  async getUserPasswordByLogin(login: string): Promise<Maybe<string>> {
+    const [row = null] = await postgres<[DbUser]>`
+      select password
+      from users
+      where login = ${login}
+      limit 1`;
+
+    return row?.password;
   }
 }
 

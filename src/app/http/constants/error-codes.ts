@@ -6,7 +6,12 @@ export const VALIDATION_ERR = 'VALIDATION_ERR';
 /**
  * Пользователь с данным логином уже существует
  */
-export const LOGIN_EXISTS = 'LOGIN_EXISTS';
+export const USER_EXISTS = 'USER_EXISTS';
+
+/**
+ * Пользователь с данным логином не найден
+ */
+export const USER_NOT_EXISTS = 'USER_NOT_EXISTS';
 
 /**
  * Внутренняя ошибка сервера
