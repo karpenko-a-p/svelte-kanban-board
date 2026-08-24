@@ -8,4 +8,4 @@ export abstract class RegisterErr extends Locker<'RegisterErr'> {}
 /**
  * Логин уже используется
  */
-export class RegisterLoginExistsErr extends RegisterErr {}
+export class RegisterUserExistsErr extends RegisterErr {}

@@ -21,6 +21,10 @@ const passwordService = PASSWORD_SERVICE.get();
 
 /**
  * Регистрация пользователя
+ * @description
+ * 1. Проверка уникальности данных пользователя
+ * 2. Создание записи пользователя в БД
+ * 3. Генерация и установка JWT токена
  */
 export const POST: RequestHandler = async ({ request, cookies }) => {
   const dto = RegisterUserDto.tryParse(await parseJson(request));
@@ -67,6 +71,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     path: '/',
     secure: PROD,
     httpOnly: true,
+    sameSite: 'strict',
     expires: new Date(Date.now() + AUTH_COOKIE_LIFETIME)
   });
 

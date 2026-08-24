@@ -20,6 +20,10 @@ const passwordService = PASSWORD_SERVICE.get();
 
 /**
  * Авторизация пользователя
+ * @description
+ * 1. Проверка наличия данных пользователя в БД
+ * 2. Проверка пароля пользователя
+ * 3. Генерация и установка JWT токена
  */
 export const POST: RequestHandler = async ({ request, cookies }) => {
   const dto = LoginUserDto.tryParse(await request.json());
@@ -58,6 +62,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     path: '/',
     secure: PROD,
     httpOnly: true,
+    sameSite: 'strict',
     expires: new Date(Date.now() + AUTH_COOKIE_LIFETIME)
   });
 

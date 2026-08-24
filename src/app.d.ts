@@ -3,7 +3,12 @@
 declare global {
   namespace App {
     // interface Error {}
-    // interface Locals {}
+    interface Locals {
+      /**
+       * Идентификатор пользователя из JWT токена
+       */
+      userId: Maybe<string>;
+    }
     // interface PageData {}
     // interface PageState {}
     // interface Platform {}

@@ -10,6 +10,7 @@ node_modules
 media-storage
 /.idea
 logs.db
+/logs
 
 # OS
 .DS_Store
