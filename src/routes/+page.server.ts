@@ -1,8 +1,13 @@
-import { ErrorDto } from '@app/http/common-dtos';
+import { FOUND } from '@app/http/constants';
 import type { PageServerLoad } from '@svelte-kit/$types';
+import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = () => {
-  const error = ErrorDto.new('ERR_CODE', 'err message')?.toPojo();
-
-  return { error };
+/**
+ * Страница авторизации пользователя
+ * @description Если пользователь авторизован, то перевести его на страницу с досками
+ */
+export const load: PageServerLoad = ({ locals }) => {
+  if (locals.isAuth) {
+    redirect(FOUND, '/boards');
+  }
 };

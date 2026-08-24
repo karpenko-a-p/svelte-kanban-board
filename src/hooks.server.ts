@@ -23,6 +23,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   // Проверка JWT токена и получение данных пользователя
   if (jwtToken) {
     event.locals.userId = await tokenService.verify(jwtToken);
+    event.locals.isAuth = event.locals.userId !== null;
   }
 
   return resolve(event);

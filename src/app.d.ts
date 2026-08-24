@@ -8,6 +8,10 @@ declare global {
        * Идентификатор пользователя из JWT токена
        */
       userId: Maybe<string>;
+      /**
+       * Пользователь авторизован
+       */
+      isAuth: boolean;
     }
     // interface PageData {}
     // interface PageState {}

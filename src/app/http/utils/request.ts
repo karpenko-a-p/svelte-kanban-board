@@ -3,6 +3,7 @@ import {
   BAD_REQUEST,
   CREATED,
   FORBIDDEN,
+  FOUND,
   INTERNAL_SERVER_ERROR,
   OK,
   UNAUTHORIZED,
@@ -26,6 +27,13 @@ class SmartResponse extends Response {
    */
   get isCreated(): boolean {
     return this.status === CREATED;
+  }
+
+  /**
+   * Проверка статуса на FOUND
+   */
+  get isFound(): boolean {
+    return this.status === FOUND;
   }
 
   /**

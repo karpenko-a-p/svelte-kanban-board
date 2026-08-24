@@ -9,6 +9,11 @@ export const OK = 200;
 export const CREATED = 201;
 
 /**
+ * Временное перенаправление
+ */
+export const FOUND = 302;
+
+/**
  * Некорректный запрос
  */
 export const BAD_REQUEST = 400;
