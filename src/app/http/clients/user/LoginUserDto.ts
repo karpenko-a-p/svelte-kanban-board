@@ -46,7 +46,7 @@ export class LoginUserDto implements Validate {
     }
 
     if (this.password.length < 6 || this.password.length > 128) {
-      errors.push('Пароль доложен быть от 6 до 32 символов включительно');
+      errors.push('Пароль доложен быть от 6 до 128 символов включительно');
     }
 
     return errors;

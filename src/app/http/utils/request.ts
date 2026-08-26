@@ -99,6 +99,7 @@ export const enum RequestErr {
  * @description является оберткой над fetch, расширяет функциональность
  * @param input - адрес запроса
  * @param init - данные для формирования запроса
+ * @returns расширенный ответ или причину ошибки (падения запроса)
  */
 export async function request(input: string | URL, init: RequestInit): Promise<Res<SmartResponse, RequestErr>> {
   try {

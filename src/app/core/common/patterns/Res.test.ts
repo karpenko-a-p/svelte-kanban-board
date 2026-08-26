@@ -86,4 +86,26 @@ describe('Result паттерн', () => {
         .unwrapErr()
     ).toBe(50);
   });
+
+  test('Методы обработки результатов', () => {
+    // Выполнение действия с ОК результатом
+    let val1 = 0;
+    expect(
+      ok(1)
+        .andThen((val) => (val1 = val))
+        .orElse(() => (val1 = 2))
+        .unwrap()
+    ).toBe(1);
+    expect(val1).toBe(1);
+
+    // Выполнение действия с ERR результатом
+    let val2 = 0;
+    expect(
+      err(1)
+        .andThen(() => (val2 = 2))
+        .orElse((err) => (val2 = err))
+        .unwrapErr()
+    ).toBe(1);
+    expect(val2).toBe(1);
+  });
 });

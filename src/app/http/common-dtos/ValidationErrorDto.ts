@@ -10,11 +10,11 @@ export class ValidationErrorDto extends ErrorDto {
   /**
    * Создание DTO ошибки валидации
    * @param message - сообщение ошибки
-   * @param mistakes - сообщения об ошибках валидации
+   * @param issues - сообщения об ошибках валидации
    */
   constructor(
     message: string,
-    readonly mistakes: string[]
+    readonly issues: string[]
   ) {
     super(VALIDATION_ERR, message);
   }
@@ -24,9 +24,7 @@ export class ValidationErrorDto extends ErrorDto {
    * @param dto - проверяемая сущность
    */
   static isExtends(dto: unknown): dto is MoreThan<ValidationErrorDto> {
-    return (
-      ErrorDto.isExtends(dto) && dto.code === VALIDATION_ERR && isArray(dto.mistakes) && dto.mistakes.every(isString)
-    );
+    return ErrorDto.isExtends(dto) && dto.code === VALIDATION_ERR && isArray(dto.issues) && dto.issues.every(isString);
   }
 
   /**
@@ -35,7 +33,7 @@ export class ValidationErrorDto extends ErrorDto {
    */
   static tryParse(dto: unknown): Maybe<ValidationErrorDto> {
     if (ValidationErrorDto.isExtends(dto)) {
-      return new ValidationErrorDto(dto.message, dto.mistakes);
+      return new ValidationErrorDto(dto.message, dto.issues);
     }
   }
 }

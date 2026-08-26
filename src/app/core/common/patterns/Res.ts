@@ -45,6 +45,18 @@ export interface Res<T, K> {
    * @param mapper
    */
   mapErr<U>(mapper: (err: K) => U): Res<T, U>;
+
+  /**
+   * Обработка OK результата
+   * @param fn - функция обработки
+   */
+  andThen(fn: (val: T) => void): Res<T, K>;
+
+  /**
+   * Обработка ERR результата
+   * @param fn - функция обработки
+   */
+  orElse(fn: (err: K) => void): Res<T, K>;
 }
 
 /**
@@ -112,6 +124,21 @@ export class Ok<T, K> implements Res<T, K> {
   mapErr<U>(): Res<T, U> {
     return this as unknown as Res<T, U>;
   }
+
+  /**
+   * @inheritDoc
+   */
+  andThen(fn: (val: T) => void): Res<T, K> {
+    fn(this.val);
+    return this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  orElse(): Res<T, K> {
+    return this;
+  }
 }
 
 /**
@@ -178,6 +205,21 @@ export class Err<T, K> implements Res<T, K> {
    */
   mapErr<U>(mapper: (err: K) => U): Res<T, U> {
     return new Err(mapper(this.err));
+  }
+
+  /**
+   * @inheritDoc
+   */
+  andThen(): Res<T, K> {
+    return this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  orElse(fn: (err: K) => void): Res<T, K> {
+    fn(this.err);
+    return this;
   }
 }
 

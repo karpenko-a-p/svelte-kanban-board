@@ -49,11 +49,11 @@ export class RegisterUserDto implements Validate {
     }
 
     if (this.fio.length < 5 || this.fio.length > 64) {
-      errors.push('ФИО должно быть от 6 до 32 символов включительно');
+      errors.push('ФИО должно быть от 6 до 64 символов включительно');
     }
 
     if (this.password.length < 6 || this.password.length > 128) {
-      errors.push('Пароль доложен быть от 6 до 32 символов включительно');
+      errors.push('Пароль доложен быть от 6 до 128 символов включительно');
     }
 
     return errors;

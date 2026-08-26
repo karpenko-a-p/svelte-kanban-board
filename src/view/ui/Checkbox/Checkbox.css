@@ -8,12 +8,16 @@
   }
 
   .checkbox input[type='checkbox'] {
-    @apply hidden;
+    @apply opacity-0 w-0 h-0;
+  }
+
+  .checkbox > label:focus-within > .checkbox-rect {
+    @apply outline-2 outline-solid;
   }
 
   .checkbox-rect {
     @apply border border-solid border-gray-200 rounded-md mr-2 transition-all overflow-hidden
-    h-5 w-5 flex-[0_0_20px];
+    h-5 w-5 flex-[0_0_20px] outline-blue-500 outline-offset-2;
   }
 
   .checkbox-icon {

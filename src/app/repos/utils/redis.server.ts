@@ -9,7 +9,7 @@ const redis = new RedisClient(REDIS_URL, {
   autoReconnect: true, // Автоматическое переподключение
   connectionTimeout: 5_000, // Ожидание до подключения 5 сек
   enableAutoPipelining: true, // Подключение группировки запросов
-  maxRetries: Infinity, // Бесконечное кол-во попыток переподключения
+  maxRetries: 2 ** 32 - 1, // Бесконечное кол-во попыток переподключения
   idleTimeout: 0, // Отключение разрыва неактивного соединения
   enableOfflineQueue: false // Отключение очереди запросов если нет соединения
 });
@@ -69,7 +69,7 @@ export async function redisPipeline<T extends Promise<unknown>>(cb: PipelineCb<T
   try {
     return ok(await cb(redis));
   } catch (error: unknown) {
-    return err(error);
+    return err(error) as Res<Awaited<T>, unknown>;
   }
 }
 

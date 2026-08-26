@@ -79,7 +79,7 @@ class UserHttpClientImpl implements UserHttpClient {
 
       // Ошибка валидации, некорректные данные
       if (ValidationErrorDto.isExtends(responseDto)) {
-        return err(new RegisterValidationErr(responseDto.mistakes));
+        return err(new RegisterValidationErr(responseDto.issues));
       }
 
       // Пользователь с таким логином уже существует
@@ -129,7 +129,7 @@ class UserHttpClientImpl implements UserHttpClient {
 
       // Ошибка валидации, некорректные данные
       if (ValidationErrorDto.isExtends(responseDto)) {
-        return err(new RegisterValidationErr(responseDto.mistakes));
+        return err(new RegisterValidationErr(responseDto.issues));
       }
 
       // Пользователь с таким логином не существует
