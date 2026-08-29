@@ -1,13 +1,14 @@
 <script lang="ts">
   import { RegisterUserExistsErr, LoginUserNotExistsErr, USER_HTTP_CLIENT } from '@app/http/clients/user';
   import { RegisterValidationErr } from '@app/http/common-errors';
+  import { NOTIFICATION_STORE, NotificationType } from '@app/store/slices/notification';
   import { input } from '@view/form-validators/input.svelte';
   import Checkbox from '@view/ui/Checkbox/Checkbox.svelte';
   import Input from '@view/ui/Input/Input.svelte';
   import { slide } from 'svelte/transition';
-
   import { goto } from '$app/navigation';
 
+  const notificationStore = NOTIFICATION_STORE.get();
   const userHttpClient = USER_HTTP_CLIENT.get();
   let register = $state(true);
   let submitted = $state(false);
@@ -58,19 +59,25 @@
 
     // Отображение ошибки при наличии, иначе перевод на экран с досками
     auth
-      .mapErr(err => {
+      .mapErr((err) => {
         if (err instanceof RegisterValidationErr) return err.errors;
         if (err instanceof RegisterUserExistsErr) return ['Пользователь с таким логином уже существует'];
         if (err instanceof LoginUserNotExistsErr) return ['Неверные логин или пароль'];
         return ['Неизвестная ошибка авторизации'];
       })
-      .andThen(() => goto('/boards', { invalidateAll: true }))
-      .orElse(err => validationErrors = err);
+      .andThen(() => {
+        notificationStore.addNotification('Вы вошли в аккаунт', NotificationType.Success);
+        goto('/boards', { invalidateAll: true });
+      })
+      .orElse((err) => {
+        notificationStore.addNotification(`Ошибка при попытке авторизации: ${err.join(', ')}`, NotificationType.Bad);
+        validationErrors = err;
+      });
   }
 </script>
 
 <div class="flex items-center justify-center h-screen w-full">
-  <div class="flex flex-col max-w-120! w-full p-2">
+  <div class="flex flex-col max-w-120 w-full p-2">
     <h1 class="mb-2">Регистрация</h1>
     <p class="mb-6">Система доступна только для авторизованных пользователей</p>
 
@@ -119,7 +126,7 @@
       <ul transition:slide class="rounded-xl border border-red-300 bg-red-200 flex flex-col gap-1 p-2 mt-4">
         {#each validationErrors as error}
           <li>
-            <p class="small text-red-500">{error}</p>
+            <p class="small text-red-600">{error}</p>
           </li>
         {/each}
       </ul>
@@ -139,4 +146,3 @@
     </div>
   </div>
 </div>
-
