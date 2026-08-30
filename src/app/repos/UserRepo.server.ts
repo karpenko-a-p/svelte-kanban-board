@@ -1,4 +1,4 @@
-import { diContainer } from '@app/core/common';
+import { diContainer, err, ok, type Res } from '@app/core/common';
 import { User } from '@app/entities';
 import type { DbUser } from '@app/repos/db-entities';
 import { postgres, REDIS_HOUR, redisGet, redisSet } from '@app/repos/utils';
@@ -12,8 +12,9 @@ export interface UserRepo {
    * @param login - логин нового пользователя
    * @param fio - ФИО нового пользователя
    * @param password - пароль нового пользователя
+   * @returns новый пользователь или соообщение о внутренней ошибке
    */
-  createUser(login: string, fio: string, password: string): Promise<Maybe<User>>;
+  createUser(login: string, fio: string, password: string): Promise<Res<User, string>>;
 
   /**
    * Проверка существования пользователя по логину
@@ -47,20 +48,21 @@ class UserRepoImpl implements UserRepo {
   /**
    * @inheritDoc
    */
-  async createUser(login: string, fio: string, password: string): Promise<Maybe<User>> {
-    const [row = null] = await postgres<[DbUser]>`
+  async createUser(login: string, fio: string, password: string): Promise<Res<User, string>> {
+    const [row] = await postgres<DbUser[]>`
       insert into users (login, fio, password)
       values (${login}, ${fio}, ${password})
       returning id, login, fio, created_at`;
 
-    const user = row && User.new(row.id, row.login, row.fio, row.created_at);
+    const user = User.new(row.id, row.login, row.fio, row.created_at);
 
     if (!user) {
-      return null;
+      return err('Ошибка приведения сущности DbUser к модели User');
     }
 
     redisSet(`user:${user.id}`, REDIS_HOUR, user);
-    return user;
+
+    return ok(user);
   }
 
   /**

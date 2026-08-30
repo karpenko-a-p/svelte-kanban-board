@@ -27,21 +27,13 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   return resolve(event);
-}
+};
 
 /**
- * Обработка серверной ошибки
+ * Обработка непредвиденной серверной ошибки
  * @description Логирование ошибки и возврат пользователю DTO ошибки сервера
  */
-export const handleError: HandleServerError = ({ error, event }) => {
-  logger.error(`
-    Непредвиденная ошибка сервера
-    #1 Сообщение: ${error}
-    #2 Метод: ${event.request.method}
-    #3 URL: ${event.request.url}
-    #4 Адресс: ${event.getClientAddress()}
-    #5 Куки ${JSON.stringify(event.cookies.getAll())}
-    #6 Хедеры ${JSON.stringify(event.request.headers.entries())}`);
-
+export const handleError: HandleServerError = ({ error: err, event }) => {
+  logger.error({ err, req: event.request }, 'Непредвиденная ошибка сервера');
   return new ServerErrorDto();
 };

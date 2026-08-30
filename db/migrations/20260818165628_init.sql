@@ -8,12 +8,11 @@ create table if not exists users
     created_at timestamptz not null default now()
 );
 
-
 create table if not exists boards
 (
     id          bigserial primary key,
     name        text not null check (length(name) <= 64),
-    description text
+    description text not null
 );
 
 create type user_board_role as enum ('Owner', 'Member');

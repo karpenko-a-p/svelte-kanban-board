@@ -21,6 +21,8 @@ declare global {
   declare type Maybe<T> = T | null | undefined;
 
   declare type MoreThan<T> = T & Record<string, unknown>;
+
+  declare type NotNil<T> = T extends null | undefined ? never : T;
 }
 
 export {};

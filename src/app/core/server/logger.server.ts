@@ -1,24 +1,24 @@
 import { PROD } from '@app/core/server/env.server';
-import pino from 'pino';
+import pino, { type LoggerOptions } from 'pino';
 
 /**
- * Конфигурация логгера
+ * Конфигурация записи логгера
  * @description запись логов в файл и трансляция в stdout
  */
 const transport = PROD
-  // ПРОМ конфигурация с логированием в файл и поток вывода
-  ? pino.transport({
+  ? // ПРОМ конфигурация с логированием в файл и поток вывода
+    pino.transport({
       targets: [
-        // Запись в stdout
         {
+          // Запись в stdout
           target: 'pino/file',
           level: 'info',
           options: {
             destination: 1
           }
         },
-        // Запись в файл
         {
+          // Запись в файл
           target: 'pino-roll',
           options: {
             file: './logs/app.log',
@@ -30,8 +30,8 @@ const transport = PROD
         }
       ]
     })
-  // ДЕВ конфигурация с понятным выводом на консоль
-  : pino.transport({
+  : // ДЕВ конфигурация с понятным выводом на консоль
+    pino.transport({
       target: 'pino-pretty',
       options: {
         colorize: true,
@@ -40,6 +40,17 @@ const transport = PROD
     });
 
 /**
+ * Настройка правил логгера
+ * @description Изменение логирования параметров запроса req
+ */
+const options: LoggerOptions = {
+  serializers: {
+    err: pino.stdSerializers.err,
+    req: (req: Request) => ({ method: req.method, url: req.url })
+  }
+};
+
+/**
  * Pino логгер
  */
-export const logger = pino(transport);
+export const logger = pino(options, transport);
