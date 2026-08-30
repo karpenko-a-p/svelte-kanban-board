@@ -3,27 +3,27 @@ import { Locker } from '@app/core/common';
 /**
  * Общие ошибки сервера (backend приложения)
  */
-export abstract class BackErr extends Locker<'BackErr'> {}
-
-/**
- * Внутренняя ошибка сервера
- */
-export class ServerErr extends BackErr {}
-
-/**
- * Был передан некорректный формат данных
- */
-export class InvalidEntityErr extends BackErr {}
-
-/**
- * Ошибка валидации
- */
-export class RegisterValidationErr extends BackErr {
+export abstract class BackErr extends Locker<'BackErr'> {
   /**
-   * Создание причины ошибки из-за валидации
-   * @param errors - список ошибок валидации
+   * Внутренняя ошибка сервера
    */
-  constructor(readonly errors: string[]) {
-    super();
-  }
+  static readonly Server = class extends BackErr {};
+
+  /**
+   * Был передан некорректный формат данных
+   */
+  static readonly InvalidEntity = class extends BackErr {};
+
+  /**
+   * Ошибка валидации
+   */
+  static readonly Validation = class extends BackErr {
+    /**
+     * Создание причины ошибки из-за валидации
+     * @param errors - список ошибок валидации
+     */
+    constructor(readonly errors: string[]) {
+      super();
+    }
+  };
 }

@@ -1,14 +1,12 @@
 import { diContainer, err, ok, type Res } from '@app/core/common';
 import type { User } from '@app/entities';
 import { ErrorDto, InvalidEntityErrorDto, ValidationErrorDto } from '@app/http/common-dtos';
-import { type BackErr, type HttpErr, InvalidEntityErr, NetworkErr } from '@app/http/common-errors';
-import { RegisterValidationErr, ServerErr } from '@app/http/common-errors';
+import { BackErr, HttpErr } from '@app/http/common-errors';
 import { USER_EXISTS, USER_NOT_EXISTS } from '@app/http/constants';
 import { ReqHeaders, request } from '@app/http/utils';
-
-import { type LoginErr, LoginUserNotExistsErr } from './LoginErr';
+import { LoginErr } from './LoginErr';
 import { LoginUserDto } from './LoginUserDto';
-import { type RegisterErr, RegisterUserExistsErr } from './RegisterErr';
+import { RegisterErr } from './RegisterErr';
 import { RegisterUserDto } from './RegisterUserDto';
 import { UserDto } from './UserDto';
 
@@ -54,7 +52,7 @@ class UserHttpClientImpl implements UserHttpClient {
 
     // Ошибка сети
     if (response.isErr()) {
-      return err(new NetworkErr());
+      return err(new HttpErr.Network());
     }
 
     const smartResponse = response.unwrap();
@@ -70,7 +68,7 @@ class UserHttpClientImpl implements UserHttpClient {
 
     // Передано некорректное DTO
     else if (smartResponse.isUnprocessableEntity && InvalidEntityErrorDto.isExtends(await smartResponse.json())) {
-      return err(new InvalidEntityErr());
+      return err(new BackErr.InvalidEntity());
     }
 
     // Ошибка с клиентской стороны
@@ -79,17 +77,17 @@ class UserHttpClientImpl implements UserHttpClient {
 
       // Ошибка валидации, некорректные данные
       if (ValidationErrorDto.isExtends(responseDto)) {
-        return err(new RegisterValidationErr(responseDto.issues));
+        return err(new BackErr.Validation(responseDto.issues));
       }
 
       // Пользователь с таким логином уже существует
       if (ErrorDto.isExtends(responseDto) && responseDto.code === USER_EXISTS) {
-        return err(new RegisterUserExistsErr());
+        return err(new RegisterErr.UserExists());
       }
     }
 
     // Неизвестная ошибка
-    return err(new ServerErr());
+    return err(new BackErr.Server());
   }
 
   /**
@@ -104,7 +102,7 @@ class UserHttpClientImpl implements UserHttpClient {
 
     // Ошибка сети
     if (response.isErr()) {
-      return err(new NetworkErr());
+      return err(new HttpErr.Network());
     }
 
     const smartResponse = response.unwrap();
@@ -120,7 +118,7 @@ class UserHttpClientImpl implements UserHttpClient {
 
     // Передано некорректное DTO
     else if (smartResponse.isUnprocessableEntity && InvalidEntityErrorDto.isExtends(await smartResponse.json())) {
-      return err(new InvalidEntityErr());
+      return err(new BackErr.InvalidEntity());
     }
 
     // Ошибка с клиентской стороны
@@ -129,17 +127,17 @@ class UserHttpClientImpl implements UserHttpClient {
 
       // Ошибка валидации, некорректные данные
       if (ValidationErrorDto.isExtends(responseDto)) {
-        return err(new RegisterValidationErr(responseDto.issues));
+        return err(new BackErr.Validation(responseDto.issues));
       }
 
       // Пользователь с таким логином не существует
       if (ErrorDto.isExtends(responseDto) && responseDto.code === USER_NOT_EXISTS) {
-        return err(new LoginUserNotExistsErr());
+        return err(new LoginErr.UserNotExists());
       }
     }
 
     // Неизвестная ошибка
-    return err(new ServerErr());
+    return err(new BackErr.Server());
   }
 
   /**
@@ -150,7 +148,7 @@ class UserHttpClientImpl implements UserHttpClient {
 
     // Ошибка сети
     if (response.isErr()) {
-      return err(new NetworkErr());
+      return err(new HttpErr.Network());
     }
 
     // Пользователь успешно вышел из системы
@@ -159,7 +157,7 @@ class UserHttpClientImpl implements UserHttpClient {
     }
 
     // Неизвестная ошибка
-    return err(new ServerErr());
+    return err(new BackErr.Server());
   }
 }
 

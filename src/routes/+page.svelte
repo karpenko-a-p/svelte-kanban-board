@@ -1,15 +1,11 @@
 <script lang="ts">
-  import { RegisterUserExistsErr, LoginUserNotExistsErr, USER_HTTP_CLIENT } from '@app/http/clients/user';
-  import { RegisterValidationErr } from '@app/http/common-errors';
-  import { NOTIFICATION_STORE, NotificationType } from '@app/store/slices/notification';
+  import { loginUser, registerUser } from '@app/use-cases/user';
   import { input } from '@view/form-validators/input.svelte';
   import Checkbox from '@view/ui/Checkbox/Checkbox.svelte';
   import Input from '@view/ui/Input/Input.svelte';
   import { slide } from 'svelte/transition';
   import { goto } from '$app/navigation';
 
-  const notificationStore = NOTIFICATION_STORE.get();
-  const userHttpClient = USER_HTTP_CLIENT.get();
   let register = $state(true);
   let submitted = $state(false);
   let agreed = $state(false);
@@ -54,25 +50,11 @@
 
     // Пользователь впервые регистрируется в системе
     const auth = register
-      ? await userHttpClient.register(login.value, fio.value, password.value)
-      : await userHttpClient.login(login.value, password.value);
+      ? await registerUser(login.value, fio.value, password.value)
+      : await loginUser(login.value, password.value);
 
     // Отображение ошибки при наличии, иначе перевод на экран с досками
-    auth
-      .mapErr((err) => {
-        if (err instanceof RegisterValidationErr) return err.errors;
-        if (err instanceof RegisterUserExistsErr) return ['Пользователь с таким логином уже существует'];
-        if (err instanceof LoginUserNotExistsErr) return ['Неверные логин или пароль'];
-        return ['Неизвестная ошибка авторизации'];
-      })
-      .andThen(() => {
-        notificationStore.addNotification('Вы вошли в аккаунт', NotificationType.Success);
-        goto('/boards', { invalidateAll: true });
-      })
-      .orElse((err) => {
-        notificationStore.addNotification(`Ошибка при попытке авторизации: ${err.join(', ')}`, NotificationType.Bad);
-        validationErrors = err;
-      });
+    auth.andThen(() => goto('/boards', { invalidateAll: true })).orElse((err) => (validationErrors = err));
   }
 </script>
 
