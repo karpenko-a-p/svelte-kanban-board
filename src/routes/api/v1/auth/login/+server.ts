@@ -5,8 +5,8 @@ import {
   AUTH_COOKIE_LIFETIME,
   AUTH_COOKIE_NAME,
   BAD_REQUEST,
-  CREATED,
   INTERNAL_SERVER_ERROR,
+  OK,
   UNPROCESSABLE_ENTITY,
   USER_NOT_EXISTS
 } from '@app/http/constants';
@@ -66,5 +66,5 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     expires: new Date(Date.now() + AUTH_COOKIE_LIFETIME)
   });
 
-  return json(UserDto.fromUser(user), { status: CREATED });
+  return json(UserDto.fromUser(user), { status: OK });
 };

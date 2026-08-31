@@ -12,23 +12,24 @@
   let validationErrors = $state<string[]>([]);
 
   const login = input('', {
+    required: [true, 'Обязательно для заполнения'],
     maxLength: [32, 'Максимальная длинна 32 символа'],
     minLength: [6, 'Минимальная длинна 6 символов']
   });
 
   const fio = input('', {
+    required: [true, 'Обязательно для заполнения'],
     maxLength: [64, 'Максимальная длинна 64 символа'],
     minLength: [5, 'Минимальная длинна 5 символов']
   });
 
   const password = input('', {
+    required: [true, 'Обязательно для заполнения'],
     maxLength: [128, 'Максимальная длинна 128 символа'],
     minLength: [6, 'Минимальная длинна 6 символов']
   });
 
-  /**
-   * Переключение между регистрацией и авторизацией
-   */
+  // Переключение между регистрацией и авторизацией
   function switchAuth(): void {
     register = !register;
     submitted = false;
@@ -116,7 +117,7 @@
 
     <!-- Действия авторизации -->
     <div class="mt-4 flex items-start justify-between">
-      <a class="small" href="#auth" onclick={switchAuth}>
+      <a class="small" href="?" onclick={switchAuth}>
         <p class="small text-inherit">
           {register ? 'Уже есть учетная запись?' : 'Зарегистрироваться'}
         </p>

@@ -1,6 +1,7 @@
 import type { Rule } from '@view/form-validators/shared';
 
 type Options = {
+  required?: Rule<boolean>;
   minLength?: Rule<number>;
   maxLength?: Rule<number>;
   matches?: Rule<RegExp>;
@@ -18,6 +19,10 @@ class InputField {
     this.value = $state(value);
 
     this.error = $derived.by(() => {
+      if (options.required?.[0] && !this.value.length) {
+        return options.required[1];
+      }
+
       if (options.minLength && this.value.length < options.minLength[0]) {
         return options.minLength[1];
       }

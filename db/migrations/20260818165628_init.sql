@@ -11,7 +11,7 @@ create table if not exists users
 create table if not exists boards
 (
     id          bigserial primary key,
-    name        text not null check (length(name) <= 64),
+    name        text not null check (length(name) >= 6 and length(name) <= 64),
     description text not null
 );
 

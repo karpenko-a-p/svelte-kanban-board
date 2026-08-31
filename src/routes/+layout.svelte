@@ -1,6 +1,8 @@
 <script lang="ts">
   import '@src/app.css';
+  import IconKanban from '@tabler/icons-svelte/icons/layout-kanban-filled';
   import Notifications from '@view/components/level-1/Notifications.svelte';
+  import NotificationsToggleButton from '@view/components/level-1/NotificationsToggleButton.svelte';
   import type { LayoutProps } from './$types';
   import { browser } from '$app/environment';
 
@@ -8,10 +10,26 @@
 </script>
 
 <div class="w-full h-full flex">
-  <div class="grow">
-    {@render children()}
+  <div class="grow flex flex-col">
+    <header class="flex justify-between p-2">
+      <!-- Главный заголовок -->
+      <h1 class="flex items-center gap-2 font-black">
+        <IconKanban size={36} class="fill-blue-500" />
+        Дикий канбан
+      </h1>
+
+      <!-- Уведомления (кнопка переключения) -->
+      {#if browser}
+        <NotificationsToggleButton />
+      {/if}
+    </header>
+
+    <main class="grow flex flex-col">
+      {@render children()}
+    </main>
   </div>
 
+  <!-- Уведомления (список) -->
   {#if browser}
     <Notifications />
   {/if}
