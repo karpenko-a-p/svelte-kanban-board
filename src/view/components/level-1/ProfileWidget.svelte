@@ -1,14 +1,29 @@
 <script lang="ts">
   import { User } from '@app/entities';
+  import { logout } from '@app/use-cases/user';
   import IconLogout from '@tabler/icons-svelte/icons/logout';
   import IconUser from '@tabler/icons-svelte/icons/user';
   import { toggle } from '@view/wrappers';
   import dayjs from 'dayjs';
   import { slide } from 'svelte/transition';
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   const user = $derived(User.tryParse(page.data.plainUser));
   const full = toggle(false);
+
+  /**
+   * Выход из аккаунта
+   * @description выыполенение сценария выхода из аккаунта и перевод пользователя на экран авторизации
+   */
+  async function logoutUser(): Promise<void> {
+    const res = await logout();
+
+    if (res.isOk()) {
+      full.falsy();
+      await goto('/', { invalidateAll: true });
+    }
+  }
 </script>
 
 {#snippet param(name: string, value: string)}
@@ -37,7 +52,7 @@
         </ul>
 
         <!-- Выход из аккаунта -->
-        <button class="small warn mt-4">
+        <button class="small warn mt-4" onclick={logoutUser}>
           <IconLogout />
           Выйти из аккаунта
         </button>

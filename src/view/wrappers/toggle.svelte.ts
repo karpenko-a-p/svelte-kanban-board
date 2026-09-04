@@ -14,8 +14,8 @@ class Toggle {
   constructor(init: boolean) {
     this._val = $state(init);
     this.toggle = this.toggle.bind(this);
-    this.false = this.false.bind(this);
-    this.true = this.true.bind(this);
+    this.falsy = this.falsy.bind(this);
+    this.truthy = this.truthy.bind(this);
   }
 
   get val(): boolean {
@@ -25,15 +25,15 @@ class Toggle {
   /**
    * Установка значение в true
    */
-  true(): void {
+  truthy(): void {
     this._val = true;
   }
 
   /**
    * Установка значение в false
    */
-  false(): void {
-    this._val = true;
+  falsy(): void {
+    this._val = false;
   }
 
   /**

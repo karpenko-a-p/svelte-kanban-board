@@ -1,9 +1,9 @@
-import { isRecord, isString, type ToPojo } from '@app/core/common';
+import { isRecord, isString, type ToPlain } from '@app/core/common';
 
 /**
  * DTO стандартной ошибки
  */
-export class ErrorDto implements ToPojo {
+export class ErrorDto implements ToPlain {
   /**
    * Создание стандартного DTO ошибки
    * @param code - код ошибки
@@ -46,7 +46,7 @@ export class ErrorDto implements ToPojo {
   /**
    * @inheritDoc
    */
-  toPojo(): Record<string, unknown> {
+  toPlain(): Record<string, unknown> {
     return {
       code: this.code,
       message: this.message
