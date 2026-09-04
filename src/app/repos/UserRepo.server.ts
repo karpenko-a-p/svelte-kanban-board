@@ -54,7 +54,7 @@ class UserRepoImpl implements UserRepo {
       values (${login}, ${fio}, ${password})
       returning id, login, fio, created_at`;
 
-    const user = User.new(row.id, row.login, row.fio, row.created_at);
+    const user = User.new(row.id, row.login, row.fio, row.created_at.toISOString());
 
     if (!user) {
       return err('Ошибка приведения сущности DbUser к модели User');
@@ -95,7 +95,7 @@ class UserRepoImpl implements UserRepo {
       where id = ${id}
       limit 1`;
 
-    const user = row && User.new(row.id, row.login, row.fio, row.created_at);
+    const user = row && User.new(row.id, row.login, row.fio, row.created_at.toISOString());
 
     redisSet(cacheKey, REDIS_HOUR, user);
     return user;
@@ -111,7 +111,7 @@ class UserRepoImpl implements UserRepo {
       where login = ${login}
       limit 1`;
 
-    const user = row && User.new(row.id, row.login, row.fio, row.created_at);
+    const user = row && User.new(row.id, row.login, row.fio, row.created_at.toISOString());
 
     user && redisSet(`user:${user.id}`, REDIS_HOUR, user);
 

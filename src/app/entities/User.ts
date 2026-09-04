@@ -1,9 +1,9 @@
-import { isDate, isRecord, isString, type ToPojo } from '@app/core/common';
+import { isRecord, isString, type ToPlain } from '@app/core/common';
 
 /**
  * Пользователь системы
  */
-export class User implements ToPojo {
+export class User implements ToPlain {
   /**
    * Создание сущности пользователя
    * @param id - идентификатор
@@ -15,7 +15,7 @@ export class User implements ToPojo {
     public id: string,
     public login: string,
     public fio: string,
-    public createdAt: Date
+    public createdAt: string
   ) {}
 
   /**
@@ -29,7 +29,7 @@ export class User implements ToPojo {
         isString(entity.id) &&
         isString(entity.login) &&
         isString(entity.login) &&
-        isDate(entity.createAt))
+        isString(entity.createdAt))
     );
   }
 
@@ -40,8 +40,8 @@ export class User implements ToPojo {
    * @param fio - ФИО
    * @param createdAt - дата создания
    */
-  static new(id: string, login: string, fio: string, createdAt: Date): Maybe<User> {
-    if (isString(id) && isString(login) && isString(fio) && isDate(createdAt)) {
+  static new(id: string, login: string, fio: string, createdAt: string): Maybe<User> {
+    if (isString(id) && isString(login) && isString(fio) && isString(createdAt)) {
       return new User(id, login, fio, createdAt);
     }
   }
@@ -69,7 +69,7 @@ export class User implements ToPojo {
   /**
    * @inheritDoc
    */
-  toPojo(): Record<string, unknown> {
+  toPlain(): Record<string, unknown> {
     return {
       id: this.id,
       login: this.login,

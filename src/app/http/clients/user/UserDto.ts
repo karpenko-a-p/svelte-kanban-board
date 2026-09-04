@@ -35,7 +35,7 @@ export class UserDto {
    * @param user - сущность пользователя
    */
   static fromUser(user: User): UserDto {
-    return new UserDto(user.id, user.login, user.fio, user.createdAt.toISOString());
+    return new UserDto(user.id, user.login, user.fio, user.createdAt);
   }
 
   /**
@@ -44,7 +44,7 @@ export class UserDto {
    */
   toUser(): User {
     return (
-      User.new(this.id, this.login, this.fio, new Date(this.createdAt)) ??
+      User.new(this.id, this.login, this.fio, this.createdAt) ??
       panic('Не удалось создать сущность пользователя из DTO пользователя')
     );
   }

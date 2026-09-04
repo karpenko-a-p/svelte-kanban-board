@@ -1,9 +1,9 @@
-import { isRecord, isString, type ToPojo } from '@app/core/common';
+import { isRecord, isString, type ToPlain } from '@app/core/common';
 
 /**
  * Канбан доска
  */
-export class Board implements ToPojo {
+export class Board implements ToPlain {
   /**
    * Создание сущности доски
    * @param id - идентификатор
@@ -62,7 +62,7 @@ export class Board implements ToPojo {
   /**
    * @inheritdoc
    */
-  toPojo(): Record<string, unknown> {
+  toPlain(): Record<string, unknown> {
     return {
       id: this.id,
       name: this.name,

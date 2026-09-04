@@ -1,2 +1,2 @@
-export * from './ToPojo';
+export * from './ToPlain';
 export * from './Validate';

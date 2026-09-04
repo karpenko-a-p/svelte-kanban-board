@@ -40,7 +40,7 @@ export async function redisGet<T>(key: string): Promise<Maybe<T>> {
  * @param val - сохраняемое значение
  */
 export function redisSet(key: string, ttl: number, val: unknown): Promise<'OK'> {
-  return redis.setex(key, ttl, JSON.stringify(val));
+  return redis.setex(key, ttl, JSON.stringify(val ?? null));
 }
 
 /**

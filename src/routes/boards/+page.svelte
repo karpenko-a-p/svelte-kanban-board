@@ -43,7 +43,7 @@
   }
 </script>
 
-<div class="container h-screen flex flex-col">
+<div class="container grow flex flex-col">
   {#if boards.length}
     <ul class="flex flex-wrap gap-2">
       {#each boards as board (board.id)}
@@ -68,11 +68,11 @@
       </button>
     </div>
   {/if}
-  F
+
   <!-- Окно создания новой канбан доски  -->
   {#if browser && creation}
     <Modal title="Создание новой канбан доски" bind:opened={creation}>
-      <form {onsubmit} novalidate class="flex flex-col gap-4 my-4">
+      <form {onsubmit} novalidate class="flex flex-col gap-4 mt-4">
         <Input
           label="Название"
           placeholder="Проект Бюджетирование"

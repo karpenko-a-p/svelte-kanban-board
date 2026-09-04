@@ -1,8 +1,8 @@
-// See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 declare global {
   namespace App {
     // interface Error {}
+
     interface Locals {
       /**
        * Идентификатор пользователя из JWT токена
@@ -13,8 +13,16 @@ declare global {
        */
       isAuth: boolean;
     }
-    // interface PageData {}
+
+    interface PageData {
+      /**
+       * Данные авторизованного пользователя
+       */
+      plainUser: Maybe<Record<strirng, unknown>>;
+    }
+
     // interface PageState {}
+
     // interface Platform {}
   }
 
