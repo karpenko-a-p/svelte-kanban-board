@@ -2,3 +2,5 @@ export * from './ErrorDto';
 export * from './ValidationErrorDto';
 export * from './ServerErrorDto';
 export * from './InvalidEntityErrorDto';
+export * from './UnauthorizedErrorDto';
+export * from './ForbiddenErrorDto';

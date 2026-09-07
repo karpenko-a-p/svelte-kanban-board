@@ -12,7 +12,7 @@ const tokenService = TOKEN_SERVICE.get();
  * Запуск приложения
  */
 export const init: ServerInit = async () => {
-  //  Redis
+  // Redis
   await redis.connect().catch(() => logger.error('Не удалось подключиться к redis'));
   redis.onclose = (): void => logger.fatal('Потеряно соединение с сервером redis');
 

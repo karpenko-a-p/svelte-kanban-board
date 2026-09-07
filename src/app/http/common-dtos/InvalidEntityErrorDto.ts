@@ -1,4 +1,4 @@
-import { INVALID_ENTITY } from '@app/http/constants';
+import { INVALID_ENTITY_ERR } from '@app/http/constants';
 
 import { ErrorDto } from './ErrorDto.ts';
 
@@ -11,7 +11,7 @@ export class InvalidEntityErrorDto extends ErrorDto {
    * @param message - сообщение об ошибке
    */
   constructor(message = 'Передан некорректный тип данных') {
-    super(INVALID_ENTITY, message);
+    super(INVALID_ENTITY_ERR, message);
   }
 
   /**
@@ -19,7 +19,7 @@ export class InvalidEntityErrorDto extends ErrorDto {
    * @param dto - проверяемая сущность
    */
   static isExtends(dto: unknown): dto is MoreThan<InvalidEntityErrorDto> {
-    return ErrorDto.isExtends(dto) && dto.code === INVALID_ENTITY;
+    return ErrorDto.isExtends(dto) && dto.code === INVALID_ENTITY_ERR;
   }
 
   /**
@@ -27,7 +27,7 @@ export class InvalidEntityErrorDto extends ErrorDto {
    * @param dto - приводимая сущность
    */
   static tryParse(dto: unknown): Maybe<InvalidEntityErrorDto> {
-    if (ErrorDto.isExtends(dto) && dto.code === INVALID_ENTITY) {
+    if (ErrorDto.isExtends(dto) && dto.code === INVALID_ENTITY_ERR) {
       return new InvalidEntityErrorDto(dto.message);
     }
   }

@@ -8,7 +8,7 @@ import {
   CREATED,
   INTERNAL_SERVER_ERROR,
   UNPROCESSABLE_ENTITY,
-  USER_EXISTS
+  USER_EXISTS_ERR
 } from '@app/http/constants';
 import { parseJson } from '@app/http/utils';
 import { USER_REPO } from '@app/repos';
@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
   // Пользователь уже существует
   if (exists) {
-    return json(ErrorDto.new(USER_EXISTS, `Пользователь с логином "${dto.login}" уже существует`), {
+    return json(new ErrorDto(USER_EXISTS_ERR, `Пользователь с логином "${dto.login}" уже существует`), {
       status: BAD_REQUEST
     });
   }
@@ -55,11 +55,11 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   const user = await userRepo.createUser(dto.login, dto.fio, hashedPass);
 
   // Внутренняя ошибка при создании записи пользователя
-  if (!user) {
+  if (user.isErr()) {
     return json(new ServerErrorDto('Не удалось создать запись пользователя'), { status: INTERNAL_SERVER_ERROR });
   }
 
-  const jwtToken = await tokenService.sign(user.id);
+  const jwtToken = await tokenService.sign(user.unwrap().id);
 
   // Внутренняя ошибка при создании токена
   if (!jwtToken) {
@@ -75,5 +75,5 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     expires: new Date(Date.now() + AUTH_COOKIE_LIFETIME)
   });
 
-  return json(UserDto.fromUser(user), { status: CREATED });
+  return json(UserDto.fromUser(user.unwrap()), { status: CREATED });
 };

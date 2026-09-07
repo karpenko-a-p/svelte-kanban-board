@@ -26,4 +26,14 @@ export abstract class BackErr extends Locker<'BackErr'> {
       super();
     }
   };
+
+  /**
+   * Не авторизован
+   */
+  static readonly Unauthorized = class extends BackErr {};
+
+  /**
+   * Недостаточно прав
+   */
+  static readonly Forbidden = class extends BackErr {};
 }

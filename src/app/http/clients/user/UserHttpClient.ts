@@ -2,7 +2,7 @@ import { diContainer, err, ok, type Res } from '@app/core/common';
 import type { User } from '@app/entities';
 import { ErrorDto, InvalidEntityErrorDto, ValidationErrorDto } from '@app/http/common-dtos';
 import { BackErr, HttpErr } from '@app/http/common-errors';
-import { USER_EXISTS, USER_NOT_EXISTS } from '@app/http/constants';
+import { USER_EXISTS_ERR, USER_NOT_EXISTS_ERR } from '@app/http/constants';
 import { ReqHeaders, request } from '@app/http/utils';
 import { LoginErr } from './LoginErr';
 import { LoginUserDto } from './LoginUserDto';
@@ -47,7 +47,7 @@ class UserHttpClientImpl implements UserHttpClient {
     const response = await request('/api/v1/auth/register', {
       method: 'POST',
       headers: ReqHeaders.default().build(),
-      body: JSON.stringify(RegisterUserDto.new(login, fio, password))
+      body: JSON.stringify(new RegisterUserDto(login, fio, password))
     });
 
     // Ошибка сети
@@ -81,7 +81,7 @@ class UserHttpClientImpl implements UserHttpClient {
       }
 
       // Пользователь с таким логином уже существует
-      if (ErrorDto.isExtends(responseDto) && responseDto.code === USER_EXISTS) {
+      if (ErrorDto.isExtends(responseDto) && responseDto.code === USER_EXISTS_ERR) {
         return err(new RegisterErr.UserExists());
       }
     }
@@ -97,7 +97,7 @@ class UserHttpClientImpl implements UserHttpClient {
     const response = await request('/api/v1/auth/login', {
       method: 'POST',
       headers: ReqHeaders.default().build(),
-      body: JSON.stringify(LoginUserDto.new(login, password))
+      body: JSON.stringify(new LoginUserDto(login, password))
     });
 
     // Ошибка сети
@@ -131,7 +131,7 @@ class UserHttpClientImpl implements UserHttpClient {
       }
 
       // Пользователь с таким логином не существует
-      if (ErrorDto.isExtends(responseDto) && responseDto.code === USER_NOT_EXISTS) {
+      if (ErrorDto.isExtends(responseDto) && responseDto.code === USER_NOT_EXISTS_ERR) {
         return err(new LoginErr.UserNotExists());
       }
     }

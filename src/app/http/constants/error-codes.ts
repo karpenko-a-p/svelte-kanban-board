@@ -6,19 +6,29 @@ export const VALIDATION_ERR = 'VALIDATION_ERR';
 /**
  * Пользователь с данным логином уже существует
  */
-export const USER_EXISTS = 'USER_EXISTS';
+export const USER_EXISTS_ERR = 'USER_EXISTS';
 
 /**
  * Пользователь с данным логином не найден
  */
-export const USER_NOT_EXISTS = 'USER_NOT_EXISTS';
+export const USER_NOT_EXISTS_ERR = 'USER_NOT_EXISTS';
 
 /**
  * Внутренняя ошибка сервера
  */
-export const SERVER_ERROR = 'SERVER_ERROR';
+export const SERVER_ERR = 'SERVER_ERROR';
 
 /**
  * Передана некорректная сущность
  */
-export const INVALID_ENTITY = 'INVALID_ENTITY';
+export const INVALID_ENTITY_ERR = 'INVALID_ENTITY';
+
+/**
+ * Не авторизован
+ */
+export const UNAUTHORIZED_ERR = 'UNAUTHORIZED';
+
+/**
+ * Недостааточно прав
+ */
+export const FORBIDDEN_ERR = 'FORBIDDEN';

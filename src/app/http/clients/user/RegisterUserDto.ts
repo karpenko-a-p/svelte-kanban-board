@@ -10,23 +10,11 @@ export class RegisterUserDto implements Validate {
    * @param fio - ФИО пользователя
    * @param password - пароль пользователя
    */
-  private constructor(
+  constructor(
     readonly login: string,
     readonly fio: string,
     readonly password: string
   ) {}
-
-  /**
-   * Создание DTO для регистрации пользователя
-   * @param login - логин пользователя
-   * @param fio - ФИО пользователя
-   * @param password - пароль пользователя
-   */
-  static new(login: string, fio: string, password: string): Maybe<RegisterUserDto> {
-    if (isString(login) && isString(fio) && isString(password)) {
-      return new RegisterUserDto(login, fio, password);
-    }
-  }
 
   /**
    * Парсинг сущности к dto

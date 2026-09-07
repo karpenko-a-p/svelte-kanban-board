@@ -1,4 +1,4 @@
-import { SERVER_ERROR } from '@app/http/constants';
+import { SERVER_ERR } from '@app/http/constants';
 
 import { ErrorDto } from './ErrorDto';
 
@@ -11,7 +11,7 @@ export class ServerErrorDto extends ErrorDto {
    * @param message - сообщение об ошибке
    */
   constructor(message = 'Внутренняя ошибка сервера') {
-    super(SERVER_ERROR, message);
+    super(SERVER_ERR, message);
   }
 
   /**
@@ -19,7 +19,7 @@ export class ServerErrorDto extends ErrorDto {
    * @param dto - приводимая сущность
    */
   static tryParse(dto: unknown): Maybe<ServerErrorDto> {
-    if (ErrorDto.isExtends(dto) && dto.code === SERVER_ERROR) {
+    if (ErrorDto.isExtends(dto) && dto.code === SERVER_ERR) {
       return new ServerErrorDto(dto.message);
     }
   }

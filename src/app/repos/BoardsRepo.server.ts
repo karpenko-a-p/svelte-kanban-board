@@ -161,4 +161,4 @@ export class BoardsRepoImpl implements BoardsRepo {
 /**
  * Регистрация DI
  */
-export const BOARD_REPO = diContainer.register<BoardsRepo>(BoardsRepoImpl.name, new BoardsRepoImpl());
+export const BOARDS_REPO = diContainer.register<BoardsRepo>(BoardsRepoImpl.name, new BoardsRepoImpl());

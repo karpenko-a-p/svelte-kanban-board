@@ -9,7 +9,7 @@ export class ErrorDto implements ToPlain {
    * @param code - код ошибки
    * @param message - сообщение ошибки
    */
-  protected constructor(
+  constructor(
     readonly code: string,
     readonly message: string
   ) {}
@@ -20,17 +20,6 @@ export class ErrorDto implements ToPlain {
    */
   static isExtends(dto: unknown): dto is MoreThan<ErrorDto> {
     return isRecord(dto) && isString(dto.code) && isString(dto.message);
-  }
-
-  /**
-   * Создание DTO стандартной ошибки с проверкой
-   * @param code - код ошибки
-   * @param message - сообщение ошибки
-   */
-  static new(code: string, message: string): Maybe<ErrorDto> {
-    if (isString(code) && isString(message)) {
-      return new ErrorDto(code, message);
-    }
   }
 
   /**

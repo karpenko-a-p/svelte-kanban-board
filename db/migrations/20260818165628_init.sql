@@ -50,17 +50,7 @@ create table if not exists tasks
     assigned_id bigint        references users (id) on delete set null
 );
 
-create table if not exists comments
-(
-    id      bigserial primary key,
-    content text,
-    task_id bigint not null references tasks (id) on delete cascade,
-    user_id bigint references users (id) on delete set null
-);
-
 -- migrate:down
-drop table if exists comments;
-
 drop table if exists tasks;
 
 drop type if exists task_priority;
