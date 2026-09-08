@@ -14,7 +14,7 @@ declare global {
 Array.prototype.removeNil = function <T>(): NotNil<T>[] {
   const res: NotNil<T>[] = [];
 
-  for (let i = 0; i < this.length - 1; i++) {
+  for (let i = 0; i < this.length; i++) {
     if (this[i] !== null && this[i] !== undefined) {
       res.push(this[i]);
     }

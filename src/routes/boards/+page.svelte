@@ -1,11 +1,13 @@
 <script lang="ts">
   import { Board } from '@app/entities';
+  import { createBoard } from '@app/use-cases/boards';
   import type { PageProps } from '@svelte-kit/boards/$types';
   import IconPlus from '@tabler/icons-svelte/icons/plus';
   import { input } from '@view/form-validators/input.svelte';
   import Input from '@view/ui/Input/Input.svelte';
   import Modal from '@view/ui/Modal/Modal.svelte';
   import { browser } from '$app/environment';
+  import { invalidateAll } from '$app/navigation';
 
   const { data }: PageProps = $props();
 
@@ -33,6 +35,7 @@
 
   /**
    * Создание новой канбан доски
+   * @description Валидация данных с формы и запуск сценария создания новой доски
    */
   async function onsubmit(): Promise<void> {
     submitted = true;
@@ -40,6 +43,9 @@
     if (name.invalid || description.invalid) {
       return;
     }
+
+    await createBoard(name.value, description.value);
+    invalidateAll();
   }
 </script>
 

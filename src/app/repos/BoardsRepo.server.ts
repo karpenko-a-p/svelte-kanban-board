@@ -124,7 +124,7 @@ export class BoardsRepoImpl implements BoardsRepo {
       [UserBoardRole.Owner]: DbUserBoardRole.Owner
     }[role];
 
-    // Создание связи пользователя и таблицы 
+    // Создание связи пользователя и таблицы
     await postgres`
       insert into boards_members (board_id, user_id, user_role)
       values (${boardId}, ${memberId}, ${dbRole})`;
@@ -138,7 +138,7 @@ export class BoardsRepoImpl implements BoardsRepo {
    */
   async removeMemberFromBoard(boardId: string, userId: string): Promise<void> {
     await postgres.transaction(async (sql) => {
-      // Удаление связи пользователя и таблицы 
+      // Удаление связи пользователя и таблицы
       await sql`
         delete from boards_members
         where user_id = ${userId} and board_id = ${boardId}`;

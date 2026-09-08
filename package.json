@@ -4,10 +4,10 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "bunx --bun --smol vite dev --host",
+    "dev": "bunx --bun vite dev --host",
     "build": "bunx --bun vite build",
     "compile": "bun build --compile --target=bun --minify ./build/index.js --outfile my-svelte-app",
-    "preview": "bunx --bun --smol vite preview",
+    "preview": "bunx --bun vite preview",
     "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",

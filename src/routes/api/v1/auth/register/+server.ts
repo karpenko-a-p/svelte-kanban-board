@@ -1,16 +1,15 @@
 import { PROD } from '@app/core/server';
 import { RegisterUserDto, UserDto } from '@app/http/clients/user';
-import { ErrorDto, InvalidEntityErrorDto, ServerErrorDto, ValidationErrorDto } from '@app/http/common-dtos';
+import { ErrorDto, ServerErrorDto } from '@app/http/common-dtos';
 import {
   AUTH_COOKIE_LIFETIME,
   AUTH_COOKIE_NAME,
   BAD_REQUEST,
   CREATED,
   INTERNAL_SERVER_ERROR,
-  UNPROCESSABLE_ENTITY,
   USER_EXISTS_ERR
 } from '@app/http/constants';
-import { parseJson } from '@app/http/utils';
+import { extractBody } from '@app/http/extractors';
 import { USER_REPO } from '@app/repos';
 import { PASSWORD_SERVICE, TOKEN_SERVICE } from '@app/services/server';
 import { json, type RequestHandler } from '@sveltejs/kit';
@@ -27,32 +26,27 @@ const passwordService = PASSWORD_SERVICE.get();
  * 3. Генерация и установка JWT токена
  */
 export const POST: RequestHandler = async ({ request, cookies }) => {
-  const dto = RegisterUserDto.tryParse(await parseJson(request));
+  const dto = await extractBody(request, RegisterUserDto);
 
-  // Передан некорректный тип данных
-  if (!dto) {
-    return json(new InvalidEntityErrorDto(), { status: UNPROCESSABLE_ENTITY });
+  // Невалидный контракт
+  if (dto.isErr()) {
+    return dto.unwrapErr();
   }
 
-  const errors = dto.validate();
+  const { fio, login, password } = dto.unwrap();
 
-  // Невалидные данные
-  if (errors.length) {
-    return json(new ValidationErrorDto('Ошибка валидации данных', errors), { status: BAD_REQUEST });
-  }
-
-  const exists = await userRepo.checkUserExistsByLogin(dto.login);
+  const exists = await userRepo.checkUserExistsByLogin(login);
 
   // Пользователь уже существует
   if (exists) {
-    return json(new ErrorDto(USER_EXISTS_ERR, `Пользователь с логином "${dto.login}" уже существует`), {
+    return json(new ErrorDto(USER_EXISTS_ERR, `Пользователь с логином "${login}" уже существует`), {
       status: BAD_REQUEST
     });
   }
 
-  const hashedPass = await passwordService.hashPassword(dto.password);
+  const hashedPass = await passwordService.hashPassword(password);
 
-  const user = await userRepo.createUser(dto.login, dto.fio, hashedPass);
+  const user = await userRepo.createUser(login, fio, hashedPass);
 
   // Внутренняя ошибка при создании записи пользователя
   if (user.isErr()) {

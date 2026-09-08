@@ -1,10 +1,10 @@
 import { FOUND } from '@app/http/constants';
-import { BOARD_REPO } from '@app/repos';
+import { BOARDS_REPO } from '@app/repos';
 import type { PageServerLoad } from '@svelte-kit/boards/$types';
 import { redirect } from '@sveltejs/kit';
 
 // Сервисы и репозитории
-const boardsRepo = BOARD_REPO.get();
+const boardsRepo = BOARDS_REPO.get();
 
 /**
  * Получение данных по доскам, доступным пользователю

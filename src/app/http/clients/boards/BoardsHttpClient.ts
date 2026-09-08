@@ -35,7 +35,7 @@ class BoardsHttpClientImpl implements BoardsHttpClient {
    * @see {BoardsHttpClient.createBoard}
    */
   async createBoard(name: string, description: string): Promise<Res<Board, HttpErr | BackErr>> {
-    const response = await request('/api/v1/board', {
+    const response = await request('/api/v1/boards', {
       method: 'POST',
       headers: ReqHeaders.default().build(),
       body: JSON.stringify(new CreateBoardDto(name, description))
