@@ -8,6 +8,7 @@ const boardsRepo = BOARDS_REPO.get();
 
 /**
  * Получение данных по доскам, доступным пользователю
+ * @returns массив канбан досок
  */
 export const load: PageServerLoad = async ({ locals }) => {
   // Пользователь не авторизован

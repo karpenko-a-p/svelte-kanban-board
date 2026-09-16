@@ -39,3 +39,10 @@ export const isBool = (val: unknown): val is boolean => typeof val === 'boolean'
  * @param val - проверяемое значение
  */
 export const isDate = (val: unknown): val is Date => val instanceof Date && !Number.isNaN(val.getTime());
+
+/**
+ * Проверка что значение является частью перечисления
+ * @param val - проверяемое значение
+ */
+export const isEnum = <T extends Record<string, unknown>>(enumVal: T, val: unknown): val is T[keyof T] =>
+  Object.keys(enumVal).includes(val as string);

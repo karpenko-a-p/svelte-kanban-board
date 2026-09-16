@@ -1,6 +1,6 @@
 import { diContainer, err, ok, type Res } from '@app/core/common';
 import { Board } from '@app/entities';
-import { type DbBoard, DbUserBoardRole } from './db-entities';
+import { type DbBoard, DbUserBoardRole } from './db';
 import { postgres, redis, REDIS_HOUR, redisGet, redisSet } from './utils';
 
 /**
@@ -38,6 +38,13 @@ export interface BoardsRepo {
   getBoardsByUserId(userId: string): Promise<Board[]>;
 
   /**
+   * Получение данных доски по идентификатору
+   * @param id - идентификатор доски
+   * @returns канбан доска, если существует
+   */
+  getBoardById(id: string): Promise<Maybe<Board>>;
+
+  /**
    * Добавление участника к канбан доске
    * @param boardId - идентификатор доски
    * @param userId - идентификатор участника (пользователя)
@@ -51,6 +58,13 @@ export interface BoardsRepo {
    * @param userId - идентификатор участника (пользователя)
    */
   removeMemberFromBoard(boardId: string, userId: string): Promise<void>;
+
+  /**
+   * Проверка досутпа пользователя к доске
+   * @param userId - идентифкиатор проверяемого пользователя
+   * @returns флаг наличия доступа
+   */
+  checkIsMember(boardId: string, userId: string): Promise<boolean>;
 }
 
 /**
@@ -83,7 +97,7 @@ export class BoardsRepoImpl implements BoardsRepo {
       return err('Ошибка приведения сущности DbBoard к модели Board');
     }
 
-    redis.del(`boards-by-user:${ownerId}`);
+    redis.del(`boards_by_user:${ownerId}`);
     redisSet(`board:${dbBoard.id}`, REDIS_HOUR, board);
 
     return ok(board);
@@ -94,7 +108,7 @@ export class BoardsRepoImpl implements BoardsRepo {
    * @see {BoardsRepo.getBoardsByUserId}
    */
   async getBoardsByUserId(userId: string): Promise<Board[]> {
-    const cacheKey = `boards-by-user:${userId}`;
+    const cacheKey = `boards_by_user:${userId}`;
     const cachedBoards = await redisGet<Board[]>(cacheKey);
 
     if (cachedBoards !== undefined) {
@@ -115,6 +129,29 @@ export class BoardsRepoImpl implements BoardsRepo {
 
   /**
    * @inheritdoc
+   * @see {BoardsRepo.getBoardById}
+   */
+  async getBoardById(id: string): Promise<Maybe<Board>> {
+    const cacheKey = `board:${id}`;
+    const cachedBoard = await redisGet<Board[]>(cacheKey);
+
+    if (cachedBoard !== undefined) {
+      return Board.tryParse(cachedBoard);
+    }
+
+    const [row = null] = await postgres`
+      select id, name, description from boards
+      where id = ${id}
+      limit 1`;
+
+    const board = Board.tryParse(row);
+
+    redisSet(cacheKey, REDIS_HOUR, board);
+    return board;
+  }
+
+  /**
+   * @inheritdoc
    * @see {BoardsRepo.addMemberToBoard}
    */
   async addMemberToBoard(boardId: string, memberId: string, role: UserBoardRole): Promise<void> {
@@ -129,7 +166,7 @@ export class BoardsRepoImpl implements BoardsRepo {
       insert into boards_members (board_id, user_id, user_role)
       values (${boardId}, ${memberId}, ${dbRole})`;
 
-    redis.del(`boards-by-user:${memberId}`);
+    redis.del(`boards_by_user:${memberId}`);
   }
 
   /**
@@ -154,7 +191,32 @@ export class BoardsRepoImpl implements BoardsRepo {
         and b.board_id = ${boardId} `;
     });
 
-    redis.del(`boards-by-user:${userId}`);
+    redis.del(`boards_by_user:${userId}`);
+  }
+
+  /**
+   * @inheritdoc
+   * @see {BoardsRepo.checkIsMember}
+   */
+  async checkIsMember(boardId: string, userId: string): Promise<boolean> {
+    const cacheKey = `board:${boardId}_has_user:${userId}`;
+
+    const cachedVal = await redisGet<boolean>(cacheKey);
+
+    if (cachedVal !== undefined) {
+      return !!cachedVal;
+    }
+
+    const [row = null] = await postgres<[{ is_member: boolean }]>`
+      select 1::bool as is_member from boards_members
+      where board_id = ${boardId} and user_id = ${userId}
+      limit 1`;
+
+    const isMember = !!row?.is_member;
+
+    redisSet(cacheKey, REDIS_HOUR, isMember);
+
+    return isMember;
   }
 }
 

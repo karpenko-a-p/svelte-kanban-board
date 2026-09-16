@@ -2,6 +2,7 @@
   import { Board } from '@app/entities';
   import { createBoard } from '@app/use-cases/boards';
   import type { PageProps } from '@svelte-kit/boards/$types';
+  import IconKanban from '@tabler/icons-svelte/icons/layout-kanban-filled';
   import IconPlus from '@tabler/icons-svelte/icons/plus';
   import { input } from '@view/form-validators/input.svelte';
   import Input from '@view/ui/Input/Input.svelte';
@@ -51,11 +52,20 @@
 
 <div class="container grow flex flex-col">
   {#if boards.length}
-    <ul class="flex flex-wrap gap-2">
+    <h2 class="my-2">Список досок</h2>
+    <ul class="grid grid-cols-4 gap-2">
       {#each boards as board (board.id)}
         <li>
-          <a href="/boards/{board.id}">
-            <p>{board.name}</p>
+          <a
+            href="/boards/{board.id}"
+            class="rounded-xl border-2 border-gray-300 p-2 w-full no-underline hover:border-blue-500"
+          >
+            <div class="flex items-center gap-2">
+              <IconKanban size={28} class="fill-blue-500" />
+              <p class="badge small">ID {board.id}</p>
+              <p class="font-bold text-lg">{board.name}</p>
+            </div>
+            <p class="secondary small">{board.description.slice(0, 100)}</p>
           </a>
         </li>
       {/each}
