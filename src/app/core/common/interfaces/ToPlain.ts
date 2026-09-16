@@ -8,3 +8,12 @@ export interface ToPlain<T = Record<string, unknown>> {
    */
   toPlain(): T;
 }
+
+/**
+ * Преобразование к чистому JS объекту
+ * @param entity - приводимая сущность
+ * @returns чистый JS обект
+ */
+export function toPlain<T>(entity: ToPlain<T>): T {
+  return entity.toPlain();
+}

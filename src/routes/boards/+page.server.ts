@@ -1,3 +1,4 @@
+import { toPlain } from '@app/core/common';
 import { FOUND } from '@app/http/constants';
 import { BOARDS_REPO } from '@app/repos';
 import type { PageServerLoad } from '@svelte-kit/boards/$types';
@@ -18,7 +19,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   // Получение канбан досок
   const boards = await boardsRepo.getBoardsByUserId(locals.userId);
-  const plainBoards = boards.map((board) => board.toPlain());
+  const plainBoards = boards.map(toPlain);
 
   return { plainBoards };
 };
