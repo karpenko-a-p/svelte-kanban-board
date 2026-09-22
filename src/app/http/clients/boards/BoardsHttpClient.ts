@@ -23,7 +23,7 @@ export interface BoardsHttpClient {
    * @param userId - идентификатор пользователя
    * @returns Список досок
    */
-  getBoardsByUserid(userId: string): Promise<Res<Board[], HttpErr | BackErr>>;
+  getBoardsByUserId(userId: string): Promise<Res<Board[], HttpErr | BackErr>>;
 }
 
 /**
@@ -63,9 +63,9 @@ class BoardsHttpClientImpl implements BoardsHttpClient {
 
   /**
    * @inheritdoc
-   * @see {BoardsHttpClient.getBoardsByUserid}
+   * @see {BoardsHttpClient.getBoardsByUserId}
    */
-  async getBoardsByUserid(): Promise<Res<Board[], HttpErr | BackErr>> {
+  async getBoardsByUserId(): Promise<Res<Board[], HttpErr | BackErr>> {
     const response = await request('/api/v1/board', {
       method: 'GET',
       headers: ReqHeaders.default().build()

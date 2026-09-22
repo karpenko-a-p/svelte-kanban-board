@@ -13,12 +13,14 @@ export interface SprintsRepo {
    * @param startedAt - дата начала спринта
    * @param finishedAt - дата окончания
    * @param boardId - идентификатор канбан доски, к которой будет привязан спринт
+   * @returns спринт или сообщение об ошибки
    */
   createSprint(name: string, startedAt: string, finishedAt: string, boardId: string): Promise<Res<Sprint, string>>;
 
   /**
    * Получения списка спринтов канбан доски
    * @param boardId - идентификатор канбан доски
+   * @returns список спринтов
    */
   getSprintsByBoardId(boardId: string): Promise<Sprint[]>;
 }
