@@ -19,6 +19,11 @@ export const USER_NOT_EXISTS_ERR = 'USER_NOT_EXISTS';
 export const SERVER_ERR = 'SERVER_ERROR';
 
 /**
+ * Некорректный запрос
+ */
+export const BAD_REQUEST_ERR = 'BAD_REQUEST_ERR';
+
+/**
  * Передана некорректная сущность
  */
 export const INVALID_ENTITY_ERR = 'INVALID_ENTITY';

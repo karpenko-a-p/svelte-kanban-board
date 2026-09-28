@@ -1,5 +1,6 @@
-import { CreateBoardDto } from '@app/http/clients/boards';
-import { CREATED } from '@app/http/constants';
+import { BoardDto, CreateBoardDto } from '@app/http/clients/boards';
+import { ServerErrorDto } from '@app/http/common-dtos';
+import { CREATED, INTERNAL_SERVER_ERROR } from '@app/http/constants';
 import { extractBody, extractUserId } from '@app/http/extractors';
 import { BOARDS_REPO } from '@app/repos';
 import { json, type RequestHandler } from '@sveltejs/kit';
@@ -31,5 +32,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   // Создание новой канбан-доски
   const createdBoard = await boardsRepo.createBoard(name, description, userId.unwrap());
 
-  return json(createdBoard, { status: CREATED });
+  if (createdBoard.isErr()) {
+    return json(new ServerErrorDto('Не удалось создать доску'), { status: INTERNAL_SERVER_ERROR });
+  }
+
+  return json(BoardDto.fromBoard(createdBoard.unwrap()), { status: CREATED });
 };

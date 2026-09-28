@@ -1,5 +1,6 @@
 import { diContainer, err, ok, type Res } from '@app/core/common';
-import type { Sprint } from '@app/entities';
+import { Sprint } from '@app/entities';
+import { InvalidEntityErrorDto, ValidationErrorDto } from '@app/http/common-dtos';
 import { BackErr, HttpErr } from '@app/http/common-errors';
 import { ReqHeaders, request } from '@app/http/utils';
 import { CreateSprintDto } from './CreateSprintDto';
@@ -23,6 +24,13 @@ export interface SprintsHttpClient {
     finishedAt: string,
     boardId: string
   ): Promise<Res<Sprint, BackErr | HttpErr>>;
+
+  /**
+   * Получения списка спринтов канбан доски
+   * @param boardId - идентификатор канбан доски
+   * @returns список спринтов
+   */
+  getSprintsByBoardId(boardId: string): Promise<Res<Sprint[], BackErr | HttpErr>>;
 }
 
 /**
@@ -39,14 +47,14 @@ export class SprintsHttpClientImpl implements SprintsHttpClient {
     finishedAt: string,
     boardId: string
   ): Promise<Res<Sprint, BackErr | HttpErr>> {
-    const response = await request('/api/v1/boards', {
+    const response = await request('/api/v1/sprints', {
       method: 'POST',
       headers: ReqHeaders.default().build(),
       body: JSON.stringify(new CreateSprintDto(name, startedAt, finishedAt, boardId))
     });
 
     // Ошибка сети
-    if (response.isErr()) { 
+    if (response.isErr()) {
       return err(new HttpErr.Network());
     }
 
@@ -61,6 +69,54 @@ export class SprintsHttpClientImpl implements SprintsHttpClient {
       }
     }
 
+    // Передано некорректное DTO
+    else if (smartResponse.isUnprocessableEntity && InvalidEntityErrorDto.isExtends(await smartResponse.json())) {
+      return err(new BackErr.InvalidEntity());
+    }
+
+    // Ошибка валидации
+    if (smartResponse.isBadRequest) {
+      const responseBody = await smartResponse.json();
+
+      if (ValidationErrorDto.isExtends(responseBody)) {
+        return err(new BackErr.Validation(responseBody.issues));
+      }
+    }
+
+    // Неизвестная ошибка
+    return err(new BackErr.Server());
+  }
+
+  /**
+   * @inheritdoc
+   * @see {SprintsHttpClient.getSprintsByBoardId}
+   */
+  async getSprintsByBoardId(boardId: string): Promise<Res<Sprint[], BackErr | HttpErr>> {
+    const response = await request(`/api/v1/sprints?board_id=${boardId}`, {
+      method: 'GET',
+      headers: ReqHeaders.default().build()
+    });
+
+    // Ошибка сети
+    if (response.isErr()) {
+      return err(new HttpErr.Network());
+    }
+
+    const smartResponse = response.unwrap();
+
+    // Данные спринтов получены
+    if (smartResponse.isOk) {
+      const responseBody = await smartResponse.json();
+
+      // Бэк вернул некорректный ответ
+      if (!responseBody || !Array.isArray(responseBody)) {
+        return err(new BackErr.Server());
+      }
+
+      return ok(responseBody.map(Sprint.tryParse).removeNil());
+    }
+
+    // Неизвестная ошибка
     return err(new BackErr.Server());
   }
 }

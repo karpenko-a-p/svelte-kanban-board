@@ -1,5 +1,6 @@
 import { diContainer, err, ok, type Res } from '@app/core/common';
 import { Board } from '@app/entities';
+import { InvalidEntityErrorDto, ValidationErrorDto } from '@app/http/common-dtos';
 import { BackErr, HttpErr } from '@app/http/common-errors';
 import { ReqHeaders, request } from '@app/http/utils';
 import { BoardDto } from './BoardDto';
@@ -49,11 +50,26 @@ class BoardsHttpClientImpl implements BoardsHttpClient {
     const smartResponse = response.unwrap();
 
     // Данные созданой доски
-    if (smartResponse.isOk) {
+    if (smartResponse.isCreated) {
       const boardDto = BoardDto.tryParse(await smartResponse.json());
 
+      // Создана новая канбан доска
       if (boardDto) {
         return ok(boardDto.toBoard());
+      }
+    }
+
+    // Передано некорректное DTO
+    else if (smartResponse.isUnprocessableEntity && InvalidEntityErrorDto.isExtends(await smartResponse.json())) {
+      return err(new BackErr.InvalidEntity());
+    }
+
+    // Ошибка валидации
+    if (smartResponse.isBadRequest) {
+      const responseDto = await smartResponse.json();
+
+      if (ValidationErrorDto.isExtends(responseDto)) {
+        return err(new BackErr.Validation(responseDto.issues));
       }
     }
 
@@ -80,14 +96,14 @@ class BoardsHttpClientImpl implements BoardsHttpClient {
 
     // Данные по доскам пользователя получены
     if (smartResponse.isOk) {
-      const boardsDto = await smartResponse.json();
+      const responseBody = await smartResponse.json();
 
       // Бэк вернул некорректный ответ
-      if (!boardsDto || !Array.isArray(boardsDto)) {
+      if (!responseBody || !Array.isArray(responseBody)) {
         return err(new BackErr.Server());
       }
 
-      return ok(boardsDto.map(Board.tryParse).removeNil());
+      return ok(responseBody.map(Board.tryParse).removeNil());
     }
 
     // Неизвестная ошибка
