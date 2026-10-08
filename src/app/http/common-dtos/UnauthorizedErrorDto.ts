@@ -1,4 +1,4 @@
-import { UNAUTHORIZED_ERR } from '@app/http/constants/error-codes';
+import { UNAUTHORIZED_ERR } from '#app/http/constants/error-codes';
 import { ErrorDto } from './ErrorDto';
 
 /**

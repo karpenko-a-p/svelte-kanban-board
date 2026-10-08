@@ -1,5 +1,5 @@
-import { User } from '@app/entities';
-import type { LayoutLoad } from '@svelte-kit/$types';
+import { User } from '#app/entities';
+import type { LayoutLoad } from '#svelte-kit/$types';
 
 /**
  * Преобразование данных пользователя, если авторизован

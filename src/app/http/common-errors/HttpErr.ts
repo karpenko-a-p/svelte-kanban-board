@@ -1,4 +1,4 @@
-import { Locker } from '@app/core/common';
+import { Locker } from '#app/core/common';
 
 /**
  * HTTP ошибка при выполнении запроса

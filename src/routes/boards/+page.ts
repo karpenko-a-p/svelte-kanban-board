@@ -1,5 +1,5 @@
-import { Board } from '@app/entities';
-import type { PageLoad } from '@svelte-kit/boards/$types';
+import { Board } from '#app/entities';
+import type { PageLoad } from '#svelte-kit/boards/$types';
 
 /**
  * Преобраазование данных для отображения страницы со списком доступных досок

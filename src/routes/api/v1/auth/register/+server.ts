@@ -1,6 +1,6 @@
-import { PROD } from '@app/core/server';
-import { RegisterUserDto, UserDto } from '@app/http/clients/user';
-import { ErrorDto, ServerErrorDto } from '@app/http/common-dtos';
+import { PROD } from '#app/core/server';
+import { RegisterUserDto, UserDto } from '#app/http/clients/user';
+import { ErrorDto, ServerErrorDto } from '#app/http/common-dtos';
 import {
   AUTH_COOKIE_LIFETIME,
   AUTH_COOKIE_NAME,
@@ -8,11 +8,11 @@ import {
   CREATED,
   INTERNAL_SERVER_ERROR,
   USER_EXISTS_ERR
-} from '@app/http/constants';
-import { extractBody } from '@app/http/extractors';
-import { USER_REPO } from '@app/repos';
-import { PASSWORD_SERVICE, TOKEN_SERVICE } from '@app/services/server';
-import { json, type RequestHandler } from '@sveltejs/kit';
+} from '#app/http/constants';
+import { extractBody } from '#app/http/extractors';
+import { USER_REPO } from '#app/repos';
+import { PASSWORD_SERVICE, TOKEN_SERVICE } from '#app/services/server';
+import type { RequestHandler } from '@sveltejs/kit';
 
 const userRepo = USER_REPO.get();
 const tokenService = TOKEN_SERVICE.get();
@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
   // Пользователь уже существует
   if (exists) {
-    return json(new ErrorDto(USER_EXISTS_ERR, `Пользователь с логином "${login}" уже существует`), {
+    return Response.json(new ErrorDto(USER_EXISTS_ERR, `Пользователь с логином "${login}" уже существует`), {
       status: BAD_REQUEST
     });
   }
@@ -50,14 +50,16 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
   // Внутренняя ошибка при создании записи пользователя
   if (user.isErr()) {
-    return json(new ServerErrorDto('Не удалось создать запись пользователя'), { status: INTERNAL_SERVER_ERROR });
+    return Response.json(new ServerErrorDto('Не удалось создать запись пользователя'), {
+      status: INTERNAL_SERVER_ERROR
+    });
   }
 
   const jwtToken = await tokenService.sign(user.unwrap().id);
 
   // Внутренняя ошибка при создании токена
   if (!jwtToken) {
-    return json(new ServerErrorDto('Не удалось создать токен'), { status: INTERNAL_SERVER_ERROR });
+    return Response.json(new ServerErrorDto('Не удалось создать токен'), { status: INTERNAL_SERVER_ERROR });
   }
 
   // Установка JWT токена в куки
@@ -69,5 +71,5 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     expires: new Date(Date.now() + AUTH_COOKIE_LIFETIME)
   });
 
-  return json(UserDto.fromUser(user.unwrap()), { status: CREATED });
+  return Response.json(UserDto.fromUser(user.unwrap()), { status: CREATED });
 };

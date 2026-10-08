@@ -1,6 +1,6 @@
 @layer components {
   button {
-    @apply border-none rounded-lg font-[500] inline-flex items-center justify-center cursor-pointer
+    @apply border-none rounded-lg font-medium inline-flex items-center justify-center cursor-pointer
     transition ease-in-out bg-blue-500 hover:bg-blue-600 text-white text-base gap-1
     max-mobile:text-sm px-4 py-2.5 max-mobile:px-3.5 max-mobile:py-2 disabled:bg-gray-100 disabled:text-gray-500
     disabled:cursor-not-allowed select-none appearance-none [&>svg]:size-6

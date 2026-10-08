@@ -1,4 +1,4 @@
-import type { BigSerial } from '@app/repos/db/types';
+import type { BigSerial } from '#app/repos/db/types';
 
 /**
  * Сущность канбан доски в БД

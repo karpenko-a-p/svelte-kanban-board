@@ -1,4 +1,4 @@
-import { SERVER_ERR } from '@app/http/constants';
+import { SERVER_ERR } from '#app/http/constants';
 
 import { ErrorDto } from './ErrorDto';
 

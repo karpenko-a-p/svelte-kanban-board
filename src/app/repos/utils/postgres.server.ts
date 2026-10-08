@@ -1,4 +1,4 @@
-import { DATABASE_URL } from '@app/core/server';
+import { DATABASE_URL } from '#app/core/server';
 import { SQL } from 'bun';
 
 /**

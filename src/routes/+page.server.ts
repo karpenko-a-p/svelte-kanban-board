@@ -1,6 +1,6 @@
-import { FOUND } from '@app/http/constants';
-import type { PageServerLoad } from '@svelte-kit/$types';
 import { redirect } from '@sveltejs/kit';
+import { FOUND } from '#app/http/constants';
+import type { PageServerLoad } from '#svelte-kit/$types';
 
 /**
  * Страница авторизации пользователя

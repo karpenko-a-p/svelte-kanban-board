@@ -1,5 +1,5 @@
-import { isRecord, isString, panic } from '@app/core/common';
-import { User } from '@app/entities';
+import { isRecord, isString, panic } from '#app/core/common';
+import { User } from '#app/entities';
 
 /**
  * DTO пользователя

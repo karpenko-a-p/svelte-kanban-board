@@ -1,4 +1,4 @@
-import { isRecord, isString, type Validate } from '@app/core/common';
+import { isRecord, isString, type Validate } from '#app/core/common';
 
 /**
  * DTO данных для создания нового спринта

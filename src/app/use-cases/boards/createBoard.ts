@@ -1,7 +1,7 @@
-import { type Res } from '@app/core/common';
-import { BOARDS_HTTP_CLIENT } from '@app/http/clients/boards';
-import { BackErr } from '@app/http/common-errors';
-import { NOTIFICATION_STORE, NotificationType } from '@app/store/slices/notification';
+import { type Res } from '#app/core/common';
+import { BOARDS_HTTP_CLIENT } from '#app/http/clients/boards';
+import { BackErr } from '#app/http/common-errors';
+import { NOTIFICATION_STORE, NotificationType } from '#app/store/slices/notification';
 
 /**
  * Создание новой канбан доски

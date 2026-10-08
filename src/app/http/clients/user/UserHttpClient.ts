@@ -1,9 +1,9 @@
-import { diContainer, err, ok, type Res } from '@app/core/common';
-import type { User } from '@app/entities';
-import { ErrorDto, InvalidEntityErrorDto, ValidationErrorDto } from '@app/http/common-dtos';
-import { BackErr, HttpErr } from '@app/http/common-errors';
-import { USER_EXISTS_ERR, USER_NOT_EXISTS_ERR } from '@app/http/constants';
-import { ReqHeaders, request } from '@app/http/utils';
+import { diContainer, err, ok, type Res } from '#app/core/common';
+import type { User } from '#app/entities';
+import { ErrorDto, InvalidEntityErrorDto, ValidationErrorDto } from '#app/http/common-dtos';
+import { BackErr, HttpErr } from '#app/http/common-errors';
+import { USER_EXISTS_ERR, USER_NOT_EXISTS_ERR } from '#app/http/constants';
+import { ReqHeaders, request } from '#app/http/utils';
 import { LoginErr } from './LoginErr';
 import { LoginUserDto } from './LoginUserDto';
 import { RegisterErr } from './RegisterErr';

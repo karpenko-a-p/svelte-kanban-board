@@ -1,4 +1,4 @@
-import type { BigSerial, DbUserBoardRole } from '@app/repos/db/types';
+import type { BigSerial, DbUserBoardRole } from '#app/repos/db/types';
 
 /**
  * Сущность связи канбан доски и пользователя в БД

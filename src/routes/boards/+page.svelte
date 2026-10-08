@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { createBoard } from '@app/use-cases/boards';
-  import type { PageProps } from '@svelte-kit/boards/$types';
   import IconKanban from '@tabler/icons-svelte/icons/layout-kanban-filled';
   import IconPlus from '@tabler/icons-svelte/icons/plus';
-  import { input } from '@view/form-validators/input.svelte';
-  import Input from '@view/ui/Input/Input.svelte';
-  import Modal from '@view/ui/Modal/Modal.svelte';
-  import { browser } from '$app/environment';
-  import { invalidateAll } from '$app/navigation';
+  import Input from '#view/ui/Input/Input.svelte';
+  import Modal from '#view/ui/Modal/Modal.svelte';
+  import { createBoard } from '#app/use-cases/boards';
+  import { input } from '#view/form-validators/input.svelte';
+  import { browser } from '$app/env';
+  import { refreshAll } from '$app/navigation';
+  import type { PageProps } from '#svelte-kit/boards/$types';
 
   const { data }: PageProps = $props();
 
@@ -45,7 +45,7 @@
     }
 
     await createBoard(name.value, description.value);
-    invalidateAll();
+    refreshAll();
   }
 </script>
 

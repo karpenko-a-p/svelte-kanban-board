@@ -28,6 +28,9 @@ export default defineConfig(
     plugins: {
       'import-x': importX
     },
+    settings: {
+      'import-x/internal-regex': '^#/'
+    },
     rules: {
       // common
       'no-undef': 'off',
@@ -56,7 +59,8 @@ export default defineConfig(
       'import-x/order': [
         'warn',
         {
-          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          groups: ['builtin', 'external', 'internal', 'unknown', 'parent', 'sibling', 'index', 'object', 'type'],
+          pathGroups: [{ pattern: '#**', group: 'external', position: 'after' }],
           alphabetize: {
             order: 'asc',
             caseInsensitive: true

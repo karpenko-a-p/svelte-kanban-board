@@ -1,5 +1,5 @@
-import { PROD } from '@app/core/server/env.server';
 import pino, { type LoggerOptions } from 'pino';
+import { PROD } from '#app/core/server/env.server';
 
 /**
  * Конфигурация записи логгера

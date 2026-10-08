@@ -1,7 +1,7 @@
-import { diContainer, err, ok, type Res } from '@app/core/common';
-import { User } from '@app/entities';
-import type { DbUser } from '@app/repos/db';
-import { postgres, REDIS_HOUR, redisGet, redisSet } from '@app/repos/utils';
+import { diContainer, err, ok, type Res } from '#app/core/common';
+import { User } from '#app/entities';
+import type { DbUser } from '#app/repos/db';
+import { postgres, REDIS_HOUR, redisGet, redisSet } from '#app/repos/utils';
 
 /**
  * Репозиторий для работы с пользователями

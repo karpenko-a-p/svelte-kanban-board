@@ -1,4 +1,4 @@
-import type { User } from '@app/entities';
+import type { User } from '#app/entities';
 
 // for information about these interfaces
 declare global {
@@ -9,7 +9,7 @@ declare global {
       /**
        * Идентификатор пользователя из JWT токена
        */
-      userId: Maybe<string>;
+      userId?: Maybe<string>;
       /**
        * Пользователь авторизован
        */
@@ -20,7 +20,7 @@ declare global {
       /**
        * Данные авторизованного пользователя
        */
-      user: Maybe<User>;
+      user?: Maybe<User>;
     }
 
     // interface PageState {}

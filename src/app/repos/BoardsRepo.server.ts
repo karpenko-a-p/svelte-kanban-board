@@ -1,5 +1,5 @@
-import { diContainer, err, ok, type Res } from '@app/core/common';
-import { Board } from '@app/entities';
+import { diContainer, err, ok, type Res } from '#app/core/common';
+import { Board } from '#app/entities';
 import { type DbBoard, DbUserBoardRole } from './db';
 import { postgres, redis, REDIS_HOUR, redisGet, redisSet } from './utils';
 

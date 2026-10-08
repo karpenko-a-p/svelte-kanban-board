@@ -1,5 +1,5 @@
-import { diContainer, err, ok, type Res } from '@app/core/common';
-import { Sprint } from '@app/entities';
+import { diContainer, err, ok, type Res } from '#app/core/common';
+import { Sprint } from '#app/entities';
 import type { DbSprint } from './db';
 import { postgres, REDIS_HOUR, redisGet, redisSet } from './utils';
 

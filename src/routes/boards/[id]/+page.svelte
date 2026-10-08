@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { SPRINTS_STORE } from '@app/store/slices/sprints';
-  import type { PageProps } from '@svelte-kit/boards/[id]/$types';
   import IconPlus from '@tabler/icons-svelte/icons/plus';
-  import { input } from '@view/form-validators/input.svelte';
-  import Input from '@view/ui/Input/Input.svelte';
-  import Modal from '@view/ui/Modal/Modal.svelte';
   import { onMount } from 'svelte';
-  import { browser } from '$app/environment';
+  import Input from '#view/ui/Input/Input.svelte';
+  import Modal from '#view/ui/Modal/Modal.svelte';
+  import { SPRINTS_STORE } from '#app/store/slices/sprints';
+  import { input } from '#view/form-validators/input.svelte';
+  import { browser } from '$app/env';
+  import type { PageProps } from '#svelte-kit/boards/[id]/$types';
 
   const { data }: PageProps = $props();
 
@@ -46,7 +46,7 @@
   }
 
   // Получение списка спринтов
-  onMount(() => {});
+  onMount(() => console.log('will be soon'));
 </script>
 
 <section class="px-2 grow flex flex-col">

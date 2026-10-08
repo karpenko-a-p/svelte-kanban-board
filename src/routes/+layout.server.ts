@@ -1,5 +1,5 @@
-import { USER_REPO } from '@app/repos';
-import type { LayoutServerLoad } from '@svelte-kit/$types';
+import { USER_REPO } from '#app/repos';
+import type { LayoutServerLoad } from '#svelte-kit/$types';
 
 // Сервисы и репозитории
 const userRepo = USER_REPO.get();

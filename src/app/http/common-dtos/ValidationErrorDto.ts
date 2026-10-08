@@ -1,5 +1,5 @@
-import { isArray, isString } from '@app/core/common';
-import { VALIDATION_ERR } from '@app/http/constants';
+import { isArray, isString } from '#app/core/common';
+import { VALIDATION_ERR } from '#app/http/constants';
 
 import { ErrorDto } from './ErrorDto';
 

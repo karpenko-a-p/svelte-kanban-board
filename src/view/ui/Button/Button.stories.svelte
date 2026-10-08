@@ -1,7 +1,7 @@
 <script module>
-  import Mock from '@project/.storybook/Mock.svelte';
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import IconCheck from '@tabler/icons-svelte/icons/check';
+  import Mock from '#project/.storybook/Mock.svelte';
 
   const { Story } = defineMeta({
     component: Mock,

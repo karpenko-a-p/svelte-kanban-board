@@ -1,5 +1,5 @@
-import { diContainer } from '@app/core/common/diContainer';
 import { describe, expect, test } from 'vitest';
+import { diContainer } from '#app/core/common/diContainer';
 
 describe('diContainer', () => {
   test('Регистрация в контейнере', () => {

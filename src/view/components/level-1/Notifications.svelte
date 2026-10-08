@@ -1,7 +1,7 @@
 <script module lang="ts">
-  import { NOTIFICATION_STORE, NotificationType } from '@app/store/slices/notification';
   import IconX from '@tabler/icons-svelte/icons/x';
   import { slide } from 'svelte/transition';
+  import { NOTIFICATION_STORE, NotificationType } from '#app/store/slices/notification';
 
   const notificationStore = NOTIFICATION_STORE.get();
 

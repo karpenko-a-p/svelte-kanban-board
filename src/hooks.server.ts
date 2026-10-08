@@ -1,9 +1,9 @@
-import { logger } from '@app/core/server';
-import { ServerErrorDto } from '@app/http/common-dtos';
-import { AUTH_COOKIE_NAME } from '@app/http/constants';
-import { redis } from '@app/repos/utils';
-import { TOKEN_SERVICE } from '@app/services/server';
-import type { Handle, HandleServerError, ServerInit } from '@sveltejs/kit';
+import { logger } from '#app/core/server';
+import { ServerErrorDto } from '#app/http/common-dtos';
+import { AUTH_COOKIE_NAME } from '#app/http/constants';
+import { redis } from '#app/repos/utils';
+import { TOKEN_SERVICE } from '#app/services/server';
+import type { Handle, HandleServerError, ServerInit } from '@sveltejs/kit/hooks';
 
 // Сервисы
 const tokenService = TOKEN_SERVICE.get();

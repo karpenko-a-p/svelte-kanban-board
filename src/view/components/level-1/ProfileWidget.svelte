@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { logout } from '@app/use-cases/user';
   import IconLogout from '@tabler/icons-svelte/icons/logout';
   import IconUser from '@tabler/icons-svelte/icons/user';
-  import { toggle } from '@view/wrappers';
   import dayjs from 'dayjs';
   import { slide } from 'svelte/transition';
+  import { logout } from '#app/use-cases/user';
+  import { toggle } from '#view/wrappers';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
@@ -20,7 +20,7 @@
 
     if (res.isOk()) {
       full.falsy();
-      await goto('/', { invalidateAll: true });
+      await goto('/', { refreshAll: true });
     }
   }
 </script>

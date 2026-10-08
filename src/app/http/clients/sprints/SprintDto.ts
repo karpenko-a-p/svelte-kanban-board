@@ -1,5 +1,5 @@
-import { isRecord, isString, panic } from '@app/core/common';
-import { Sprint } from '@app/entities';
+import { isRecord, isString, panic } from '#app/core/common';
+import { Sprint } from '#app/entities';
 
 /**
  * DTO спринта

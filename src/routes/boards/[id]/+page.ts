@@ -1,6 +1,6 @@
-import { Board } from '@app/entities';
-import type { PageLoad } from '@svelte-kit/boards/[id]/$types';
 import { error } from '@sveltejs/kit';
+import { Board } from '#app/entities';
+import type { PageLoad } from '#svelte-kit/boards/[id]/$types';
 
 /**
  * Преобраазование данных для отображения страницы

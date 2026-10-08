@@ -1,6 +1,6 @@
 <script module lang="ts">
-  import { NOTIFICATION_STORE } from '@app/store/slices/notification';
   import IconMessageFilled from '@tabler/icons-svelte/icons/message-filled';
+  import { NOTIFICATION_STORE } from '#app/store/slices/notification';
 
   // Сторы
   const notificationStore = NOTIFICATION_STORE.get();

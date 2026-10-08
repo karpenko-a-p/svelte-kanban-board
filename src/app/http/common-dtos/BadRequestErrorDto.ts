@@ -1,4 +1,4 @@
-import { BAD_REQUEST_ERR } from '@app/http/constants/error-codes';
+import { BAD_REQUEST_ERR } from '#app/http/constants/error-codes';
 import { ErrorDto } from './ErrorDto';
 
 /**

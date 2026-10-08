@@ -1,5 +1,5 @@
-import { diContainer, isString } from '@app/core/common';
-import { JWT_SECRET } from '@app/core/server';
+import { diContainer, isString } from '#app/core/common';
+import { JWT_SECRET } from '#app/core/server';
 import { SignJWT, jwtVerify } from 'jose';
 
 /**

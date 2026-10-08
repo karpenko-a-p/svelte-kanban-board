@@ -1,5 +1,5 @@
-import { Err, err, Ok, ok } from '@app/core/common/patterns/Res';
 import { describe, expect, test } from 'vitest';
+import { Err, err, Ok, ok } from '#app/core/common/patterns/Res';
 
 describe('Result паттерн', () => {
   test('Создание OK результата ', () => {

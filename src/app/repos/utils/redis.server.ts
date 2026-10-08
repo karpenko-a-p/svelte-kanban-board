@@ -1,4 +1,4 @@
-import { REDIS_URL } from '@app/core/server/env.server';
+import { REDIS_URL } from '#app/core/server/env.server';
 import { RedisClient } from 'bun';
 
 /**

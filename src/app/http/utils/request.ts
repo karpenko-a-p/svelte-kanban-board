@@ -1,4 +1,4 @@
-import { err, ok, type Res } from '@app/core/common';
+import { err, ok, type Res } from '#app/core/common';
 import {
   BAD_REQUEST,
   CREATED,
@@ -8,7 +8,7 @@ import {
   OK,
   UNAUTHORIZED,
   UNPROCESSABLE_ENTITY
-} from '@app/http/constants';
+} from '#app/http/constants';
 
 /**
  * Расширение стандартного ответа Response

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { loginUser, registerUser } from '@app/use-cases/user';
-  import { input } from '@view/form-validators/input.svelte';
-  import Checkbox from '@view/ui/Checkbox/Checkbox.svelte';
-  import Input from '@view/ui/Input/Input.svelte';
   import { slide } from 'svelte/transition';
+  import Checkbox from '#view/ui/Checkbox/Checkbox.svelte';
+  import Input from '#view/ui/Input/Input.svelte';
+  import { loginUser, registerUser } from '#app/use-cases/user';
+  import { input } from '#view/form-validators/input.svelte';
   import { goto } from '$app/navigation';
 
   let register = $state(true);
@@ -55,7 +55,7 @@
       : await loginUser(login.value, password.value);
 
     // Отображение ошибки при наличии, иначе перевод на экран с досками
-    auth.andThen(() => goto('/boards', { invalidateAll: true })).orElse((err) => (validationErrors = err));
+    auth.andThen(() => goto('/boards', { refreshAll: true })).orElse((err) => (validationErrors = err));
   }
 </script>
 

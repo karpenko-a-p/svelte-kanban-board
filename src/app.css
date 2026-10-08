@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
 /*Настройка tailwindcss*/
-@import '@view/ui/font.css';
-@import '@view/ui/theme.css';
-@import '@view/ui/components.css';
+@import '#view/ui/font.css';
+@import '#view/ui/theme.css';
+@import '#view/ui/components.css';

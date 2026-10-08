@@ -1,4 +1,4 @@
-import { isEnum, isRecord, isString, type ToPlain } from '@app/core/common';
+import { isEnum, isRecord, isString, type ToPlain } from '#app/core/common';
 
 /**
  * Статус задачи

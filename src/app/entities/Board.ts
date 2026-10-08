@@ -1,4 +1,4 @@
-import { isRecord, isString, type ToPlain } from '@app/core/common';
+import { isRecord, isString, type ToPlain } from '#app/core/common';
 
 /**
  * Канбан доска

@@ -1,4 +1,4 @@
-import type { Rule } from '@view/form-validators/shared';
+import type { Rule } from '#view/form-validators/shared';
 
 type Options = {
   required?: Rule<boolean>;

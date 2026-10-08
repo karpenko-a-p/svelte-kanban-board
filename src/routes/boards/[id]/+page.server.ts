@@ -1,7 +1,7 @@
-import { FOUND } from '@app/http/constants';
-import { BOARDS_REPO } from '@app/repos';
-import type { PageServerLoad } from '@svelte-kit/boards/[id]/$types';
 import { redirect } from '@sveltejs/kit';
+import { FOUND } from '#app/http/constants';
+import { BOARDS_REPO } from '#app/repos';
+import type { PageServerLoad } from '#svelte-kit/boards/[id]/$types';
 
 // Сервисы и репозитории
 const boardsRepo = BOARDS_REPO.get();

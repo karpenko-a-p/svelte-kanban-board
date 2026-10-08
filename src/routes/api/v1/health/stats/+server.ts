@@ -1,4 +1,4 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from '@sveltejs/kit';
 
 /**
  * Проверка показателей сервиса
@@ -8,7 +8,7 @@ export const GET: RequestHandler = () => {
   const memoryUsage = process.memoryUsage();
   const cpuUsage = process.cpuUsage();
 
-  return json({
+  return Response.json({
     memoryUsage: {
       rss: bytesToMb(memoryUsage.rss),
       heapTotal: bytesToMb(memoryUsage.heapTotal),

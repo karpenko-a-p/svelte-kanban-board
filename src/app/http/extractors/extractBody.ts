@@ -1,5 +1,5 @@
-import { err, ok, type Res, type TryParse, type Validate } from '@app/core/common';
-import { InvalidEntityErrorDto, ValidationErrorDto } from '@app/http/common-dtos';
+import { err, ok, type Res, type TryParse, type Validate } from '#app/core/common';
+import { InvalidEntityErrorDto, ValidationErrorDto } from '#app/http/common-dtos';
 
 /**
  * Извлечение тела запроса

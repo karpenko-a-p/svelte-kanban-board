@@ -1,4 +1,4 @@
-import { diContainer } from '@app/core/common';
+import { diContainer } from '#app/core/common';
 import type { Notification } from './Notification';
 import type { NotificationType } from './NotificationType';
 

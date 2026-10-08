@@ -1,10 +1,10 @@
-import { SprintDto } from '@app/http/clients/sprints';
-import { CreateSprintDto } from '@app/http/clients/sprints/CreateSprintDto';
-import { BadRequestErrorDto, ForbiddenErrorDto, ServerErrorDto } from '@app/http/common-dtos';
-import { BAD_REQUEST, CREATED, FORBIDDEN, INTERNAL_SERVER_ERROR, OK } from '@app/http/constants';
-import { extractBody, extractUserId } from '@app/http/extractors';
-import { BOARDS_REPO, SPRINTS_REPO } from '@app/repos';
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { SprintDto } from '#app/http/clients/sprints';
+import { CreateSprintDto } from '#app/http/clients/sprints/CreateSprintDto';
+import { BadRequestErrorDto, ForbiddenErrorDto, ServerErrorDto } from '#app/http/common-dtos';
+import { BAD_REQUEST, CREATED, FORBIDDEN, INTERNAL_SERVER_ERROR, OK } from '#app/http/constants';
+import { extractBody, extractUserId } from '#app/http/extractors';
+import { BOARDS_REPO, SPRINTS_REPO } from '#app/repos';
+import type { RequestHandler } from '@sveltejs/kit';
 
 // Сервисы и репы
 const sprintsRepo = SPRINTS_REPO.get();
@@ -32,16 +32,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   // Только участники доски могут создать новый спринт
   if (!(await boardsRepo.checkIsMember(boardId, userId.unwrap()))) {
-    return json(new ForbiddenErrorDto(), { status: FORBIDDEN });
+    return Response.json(new ForbiddenErrorDto(), { status: FORBIDDEN });
   }
 
   const createdSprint = await sprintsRepo.createSprint(name, startedAt, finishedAt, boardId);
 
   if (createdSprint.isErr()) {
-    return json(new ServerErrorDto('Не удалось создать спринт'), { status: INTERNAL_SERVER_ERROR });
+    return Response.json(new ServerErrorDto('Не удалось создать спринт'), { status: INTERNAL_SERVER_ERROR });
   }
 
-  return json(SprintDto.fromSprint(createdSprint.unwrap()), { status: CREATED });
+  return Response.json(SprintDto.fromSprint(createdSprint.unwrap()), { status: CREATED });
 };
 
 /**
@@ -58,15 +58,15 @@ export const GET: RequestHandler = async ({ locals, url }) => {
   const boardId = url.searchParams.get('board-id');
 
   if (!boardId) {
-    return json(new BadRequestErrorDto('Не установлен идентификатор доски'), { status: BAD_REQUEST });
+    return Response.json(new BadRequestErrorDto('Не установлен идентификатор доски'), { status: BAD_REQUEST });
   }
 
   // Только участники доски могут получить список спринтов
   if (!(await boardsRepo.checkIsMember(boardId, userId.unwrap()))) {
-    return json(new ForbiddenErrorDto(), { status: FORBIDDEN });
+    return Response.json(new ForbiddenErrorDto(), { status: FORBIDDEN });
   }
 
   const sprints = await sprintsRepo.getSprintsByBoardId(boardId);
 
-  return json(sprints.map(SprintDto.tryParse).removeNil(), { status: OK });
+  return Response.json(sprints.map(SprintDto.tryParse).removeNil(), { status: OK });
 };

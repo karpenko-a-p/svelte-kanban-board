@@ -1,4 +1,4 @@
-import { diContainer } from '@app/core/common';
+import { diContainer } from '#app/core/common';
 import { password } from 'bun';
 
 /**

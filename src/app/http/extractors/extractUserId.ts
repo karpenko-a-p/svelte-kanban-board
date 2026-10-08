@@ -1,6 +1,6 @@
-import { err, ok, type Res } from '@app/core/common';
-import { UnauthorizedErrorDto } from '@app/http/common-dtos';
-import { UNAUTHORIZED } from '@app/http/constants';
+import { err, ok, type Res } from '#app/core/common';
+import { UnauthorizedErrorDto } from '#app/http/common-dtos';
+import { UNAUTHORIZED } from '#app/http/constants';
 
 /**
  * Извлечение идентификатора пользователя из запроса

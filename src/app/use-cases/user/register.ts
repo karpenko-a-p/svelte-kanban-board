@@ -1,7 +1,7 @@
-import { err, ok, type Res } from '@app/core/common';
-import { RegisterErr, USER_HTTP_CLIENT } from '@app/http/clients/user';
-import { BackErr } from '@app/http/common-errors';
-import { NOTIFICATION_STORE, NotificationType } from '@app/store/slices/notification';
+import { err, ok, type Res } from '#app/core/common';
+import { RegisterErr, USER_HTTP_CLIENT } from '#app/http/clients/user';
+import { BackErr } from '#app/http/common-errors';
+import { NOTIFICATION_STORE, NotificationType } from '#app/store/slices/notification';
 
 /**
  * Регистрация пользователя в системе

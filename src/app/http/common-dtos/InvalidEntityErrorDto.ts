@@ -1,4 +1,4 @@
-import { INVALID_ENTITY_ERR } from '@app/http/constants';
+import { INVALID_ENTITY_ERR } from '#app/http/constants';
 
 import { ErrorDto } from './ErrorDto.ts';
 

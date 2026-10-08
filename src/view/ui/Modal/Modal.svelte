@@ -7,9 +7,9 @@
 
 <script lang="ts">
   import IconX from '@tabler/icons-svelte/icons/x';
+  import { fade, scale } from 'svelte/transition';
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
-  import { fade, scale } from 'svelte/transition';
 
   interface Props extends HTMLAttributes<HTMLElement> {
     opened: boolean;

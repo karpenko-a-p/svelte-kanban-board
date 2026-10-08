@@ -1,8 +1,8 @@
-import { diContainer, err, ok, type Res } from '@app/core/common';
-import { Board } from '@app/entities';
-import { InvalidEntityErrorDto, ValidationErrorDto } from '@app/http/common-dtos';
-import { BackErr, HttpErr } from '@app/http/common-errors';
-import { ReqHeaders, request } from '@app/http/utils';
+import { diContainer, err, ok, type Res } from '#app/core/common';
+import { Board } from '#app/entities';
+import { InvalidEntityErrorDto, ValidationErrorDto } from '#app/http/common-dtos';
+import { BackErr, HttpErr } from '#app/http/common-errors';
+import { ReqHeaders, request } from '#app/http/utils';
 import { BoardDto } from './BoardDto';
 import { CreateBoardDto } from './CreateBoardDto';
 
