@@ -1,44 +1,6 @@
 import { diContainer } from '@app/core/common';
-
-/**
- * Тип уведомления
- */
-export const enum NotificationType {
-  /**
-   * Успешное
-   */
-  Success,
-  /**
-   * Нейтральное
-   */
-  Neutral,
-  /**
-   * Предупреждение
-   */
-  Warning,
-  /**
-   * Что-то плохое
-   */
-  Bad
-}
-
-/**
- * Хранимая сущность уведомления
- */
-export type Notification = {
-  /**
-   * Идентификатор уведомления
-   */
-  id: string;
-  /**
-   * Тип уведомления
-   */
-  type: NotificationType;
-  /**
-   * Сообщение уведомления
-   */
-  message: string;
-};
+import type { Notification } from './Notification';
+import type { NotificationType } from './NotificationType';
 
 /**
  * Хранилище для клиентских уведомлений

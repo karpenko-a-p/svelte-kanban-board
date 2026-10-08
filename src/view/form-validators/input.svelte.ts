@@ -31,7 +31,7 @@ class InputField {
         return options.maxLength[1];
       }
 
-      if (options.matches && options.matches[0].test(this.value)) {
+      if (options.matches && !options.matches[0].test(this.value)) {
         return options.matches[1];
       }
 

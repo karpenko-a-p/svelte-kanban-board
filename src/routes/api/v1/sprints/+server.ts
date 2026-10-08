@@ -1,7 +1,7 @@
 import { SprintDto } from '@app/http/clients/sprints';
 import { CreateSprintDto } from '@app/http/clients/sprints/CreateSprintDto';
-import { ForbiddenErrorDto, ServerErrorDto } from '@app/http/common-dtos';
-import { CREATED, FORBIDDEN, INTERNAL_SERVER_ERROR } from '@app/http/constants';
+import { BadRequestErrorDto, ForbiddenErrorDto, ServerErrorDto } from '@app/http/common-dtos';
+import { BAD_REQUEST, CREATED, FORBIDDEN, INTERNAL_SERVER_ERROR, OK } from '@app/http/constants';
 import { extractBody, extractUserId } from '@app/http/extractors';
 import { BOARDS_REPO, SPRINTS_REPO } from '@app/repos';
 import { json, type RequestHandler } from '@sveltejs/kit';
@@ -42,4 +42,31 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   return json(SprintDto.fromSprint(createdSprint.unwrap()), { status: CREATED });
+};
+
+/**
+ * Получения списка спринтов канбан доски
+ */
+export const GET: RequestHandler = async ({ locals, url }) => {
+  const userId = extractUserId(locals);
+
+  // Не авторизован
+  if (userId.isErr()) {
+    return userId.unwrapErr();
+  }
+
+  const boardId = url.searchParams.get('board-id');
+
+  if (!boardId) {
+    return json(new BadRequestErrorDto('Не установлен идентификатор доски'), { status: BAD_REQUEST });
+  }
+
+  // Только участники доски могут получить список спринтов
+  if (!(await boardsRepo.checkIsMember(boardId, userId.unwrap()))) {
+    return json(new ForbiddenErrorDto(), { status: FORBIDDEN });
+  }
+
+  const sprints = await sprintsRepo.getSprintsByBoardId(boardId);
+
+  return json(sprints.map(SprintDto.tryParse).removeNil(), { status: OK });
 };

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { User } from '@app/entities';
   import { logout } from '@app/use-cases/user';
   import IconLogout from '@tabler/icons-svelte/icons/logout';
   import IconUser from '@tabler/icons-svelte/icons/user';
@@ -9,7 +8,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  const user = $derived(User.tryParse(page.data.plainUser));
+  const user = $derived(page.data.user);
   const full = toggle(false);
 
   /**

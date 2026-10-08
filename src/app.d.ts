@@ -1,3 +1,5 @@
+import type { User } from '@app/entities';
+
 // for information about these interfaces
 declare global {
   namespace App {
@@ -18,7 +20,7 @@ declare global {
       /**
        * Данные авторизованного пользователя
        */
-      plainUser: Maybe<Record<strirng, unknown>>;
+      user: Maybe<User>;
     }
 
     // interface PageState {}

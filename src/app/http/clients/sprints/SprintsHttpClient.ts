@@ -92,7 +92,7 @@ export class SprintsHttpClientImpl implements SprintsHttpClient {
    * @see {SprintsHttpClient.getSprintsByBoardId}
    */
   async getSprintsByBoardId(boardId: string): Promise<Res<Sprint[], BackErr | HttpErr>> {
-    const response = await request(`/api/v1/sprints?board_id=${boardId}`, {
+    const response = await request(`/api/v1/sprints?board-id=${boardId}`, {
       method: 'GET',
       headers: ReqHeaders.default().build()
     });

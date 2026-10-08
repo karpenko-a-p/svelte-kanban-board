@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Board } from '@app/entities';
   import { createBoard } from '@app/use-cases/boards';
   import type { PageProps } from '@svelte-kit/boards/$types';
   import IconKanban from '@tabler/icons-svelte/icons/layout-kanban-filled';
@@ -14,7 +13,7 @@
 
   let creation = $state(false);
   let submitted = $state(false);
-  const boards = $derived(data.plainBoards.map(Board.tryParse).removeNil());
+  const boards = $derived(data.boards);
 
   const name = input('', {
     required: [true, 'Обязательно для заполнения'],

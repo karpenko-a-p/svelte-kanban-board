@@ -9,7 +9,7 @@ export class BadRequestErrorDto extends ErrorDto {
    * Создание DTO
    * @param mesaage - сообщение ошибки
    */
-  constructor(message = 'Недостаточно прав') {
+  constructor(message = 'Некорректный запрос') {
     super(BAD_REQUEST_ERR, message);
   }
 
