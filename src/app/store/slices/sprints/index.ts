@@ -1,1 +1,1 @@
-export * from './sprintsStore';
+export * from './SprintsStore.svelte';

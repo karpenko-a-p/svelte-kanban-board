@@ -62,16 +62,21 @@ export class SprintsHttpClientImpl implements SprintsHttpClient {
 
     // Доска создана
     if (smartResponse.isCreated) {
-      const sprint = SprintDto.tryParse(await smartResponse.json());
+      const sprintDto = SprintDto.tryParse(await smartResponse.json());
 
-      if (sprint) {
-        return ok(sprint.toSprint());
+      if (sprintDto) {
+        return ok(sprintDto.toSprint());
       }
     }
 
     // Передано некорректное DTO
     else if (smartResponse.isUnprocessableEntity && InvalidEntityErrorDto.isExtends(await smartResponse.json())) {
       return err(new BackErr.InvalidEntity());
+    }
+
+    // Нет прав для создания спринта
+    else if (smartResponse.isForbidden) {
+      return err(new BackErr.Forbidden());
     }
 
     // Ошибка валидации

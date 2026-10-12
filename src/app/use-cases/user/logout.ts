@@ -1,6 +1,6 @@
-import type { Res } from '#app/core/common';
 import { USER_HTTP_CLIENT } from '#app/http/clients/user';
 import { NOTIFICATION_STORE, NotificationType } from '#app/store/slices/notification';
+import type { Res } from '#app/core/common';
 
 /**
  * Выход из аккаунта

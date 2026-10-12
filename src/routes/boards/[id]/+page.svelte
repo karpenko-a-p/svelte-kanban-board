@@ -1,20 +1,21 @@
 <script lang="ts">
   import IconPlus from '@tabler/icons-svelte/icons/plus';
   import { onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
   import Input from '#view/ui/Input/Input.svelte';
   import Modal from '#view/ui/Modal/Modal.svelte';
   import { SPRINTS_STORE } from '#app/store/slices/sprints';
+  import { createSprint } from '#app/use-cases/sprints';
   import { input } from '#view/form-validators/input.svelte';
   import { browser } from '$app/env';
   import type { PageProps } from '#svelte-kit/boards/[id]/$types';
 
-  const { data }: PageProps = $props();
-
-  // Сторы
   const sprintsStore = SPRINTS_STORE.get();
 
+  const { data }: PageProps = $props();
   let creation = $state(false);
   let submitted = $state(false);
+  let validationErrors: string[] = $state([]);
   const board = $derived(data.board);
 
   const name = input('', {
@@ -32,8 +33,17 @@
     matches: [/\d{2}.\d{2}.\d{4}/, 'Формат даты ДД.ММ.ГГГГ']
   });
 
+  // Отправка формы (Создание нового спринта)
   async function onsubmit(): Promise<void> {
     submitted = true;
+
+    // Данные спринта заполнены некорректно
+    if (name.invalid || startedAt.invalid || finishedAt.invalid) {
+      return;
+    }
+
+    // Создание нового спринта
+    await createSprint(name.value, startedAt.value, finishedAt.value, board.id);
   }
 
   // Открытие модального окна с созданием спринта
@@ -61,7 +71,7 @@
       </button>
 
       <ul class="flex flex-col gap-2">
-        {#each sprintsStore.get() as sprint (sprint.id)}
+        {#each sprintsStore.getSprints() as sprint (sprint.id)}
           <li class="p-2 rounded-2xl">
             {sprint.name}
           </li>
@@ -103,6 +113,17 @@
         errorMessage={finishedAt.error}
         description="Введите дату окончания спринта"
       />
+
+      <!-- Ошибки валидации пришедшие с backend -->
+      {#if validationErrors.length}
+        <ul transition:slide class="rounded-xl border border-red-300 bg-red-200 flex flex-col gap-1 p-2 mt-4">
+          {#each validationErrors as error}
+            <li>
+              <p class="small text-red-600">{error}</p>
+            </li>
+          {/each}
+        </ul>
+      {/if}
 
       <!-- Создание новой доски -->
       <button class="mt-4" type="submit">
