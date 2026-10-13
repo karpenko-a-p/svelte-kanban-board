@@ -1,5 +1,8 @@
-import type { Rule } from '#view/form-validators/shared';
+import type { FormValidator, Rule } from '#view/form-validators/shared';
 
+/**
+ * Параметры конфигурации валидатора для текстового поля
+ */
 type Options = {
   required?: Rule<boolean>;
   minLength?: Rule<number>;
@@ -9,11 +12,13 @@ type Options = {
 
 /**
  * Валидатор для текстового поля
+ * @implements {FormValidator}
  */
-class InputField {
+class InputValidator implements FormValidator {
   value: string;
   readonly error: string;
   readonly invalid: boolean;
+  reset: () => void;
 
   constructor(value = '', options: Options) {
     this.value = $state(value);
@@ -39,6 +44,8 @@ class InputField {
     });
 
     this.invalid = $derived(!!this.error);
+
+    this.reset = (): void => void (this.value = value);
   }
 }
 
@@ -47,6 +54,6 @@ class InputField {
  * @param init - значение
  * @param options - набор валидаций
  */
-export function input(init: string, options: Options): InputField {
-  return new InputField(init, options);
+export function input(init: string, options: Options): InputValidator {
+  return new InputValidator(init, options);
 }

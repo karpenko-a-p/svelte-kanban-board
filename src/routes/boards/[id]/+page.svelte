@@ -6,6 +6,7 @@
   import Modal from '#view/ui/Modal/Modal.svelte';
   import { SPRINTS_STORE } from '#app/store/slices/sprints';
   import { createSprint } from '#app/use-cases/sprints';
+  import { createForm } from '#view/form-validators/form.svelte';
   import { input } from '#view/form-validators/input.svelte';
   import { browser } from '$app/env';
   import type { PageProps } from '#svelte-kit/boards/[id]/$types';
@@ -14,45 +15,38 @@
 
   const { data }: PageProps = $props();
   let creation = $state(false);
-  let submitted = $state(false);
   let validationErrors: string[] = $state([]);
   const board = $derived(data.board);
 
-  const name = input('', {
-    required: [true, 'Обязательно для заполнения'],
-    maxLength: [64, 'Максимальная длинна 64 символа']
-  });
-
-  const startedAt = input('', {
-    required: [true, 'Обязательно для заполнения'],
-    matches: [/\d{2}.\d{2}.\d{4}/, 'Формат даты ДД.ММ.ГГГГ']
-  });
-
-  const finishedAt = input('', {
-    required: [true, 'Обязательно для заполнения'],
-    matches: [/\d{2}.\d{2}.\d{4}/, 'Формат даты ДД.ММ.ГГГГ']
-  });
-
-  // Отправка формы (Создание нового спринта)
-  async function onsubmit(): Promise<void> {
-    submitted = true;
-
-    // Данные спринта заполнены некорректно
-    if (name.invalid || startedAt.invalid || finishedAt.invalid) {
-      return;
+  const form = createForm({
+    fields: {
+      name: input('', {
+        required: [true, 'Обязательно для заполнения'],
+        maxLength: [64, 'Максимальная длинна 64 символа']
+      }),
+      startedAt: input('', {
+        required: [true, 'Обязательно для заполнения'],
+        matches: [/^\d{2}.\d{2}.\d{4}$/, 'Формат даты ДД.ММ.ГГГГ']
+      }),
+      finishedAt: input('', {
+        required: [true, 'Обязательно для заполнения'],
+        matches: [/^\d{2}.\d{2}.\d{4}$/, 'Формат даты ДД.ММ.ГГГГ']
+      })
+    },
+    onsubmit(): void {
+      // Создание нового спринта
+      const { name, finishedAt, startedAt } = form.fields;
+      createSprint(name.value, startedAt.value, finishedAt.value, board.id);
     }
+  });
 
-    // Создание нового спринта
-    await createSprint(name.value, startedAt.value, finishedAt.value, board.id);
-  }
+  // Поля формы
+  const { name, startedAt, finishedAt } = form.fields;
 
   // Открытие модального окна с созданием спринта
   function openCreation(): void {
     creation = true;
-    submitted = false;
-    name.value = '';
-    startedAt.value = '';
-    finishedAt.value = '';
+    form.reset();
   }
 
   // Получение списка спринтов
@@ -86,12 +80,12 @@
 <!-- Окно создания нового спринта  -->
 {#if browser && creation}
   <Modal title="Создание нового спринта" bind:opened={creation}>
-    <form {onsubmit} novalidate class="flex flex-col gap-4 mt-4">
+    <form onsubmit={form.onsubmit} novalidate class="flex flex-col gap-4 mt-4">
       <Input
         label="Название"
         placeholder="Спринт №1"
         bind:value={name.value}
-        invalid={submitted && name.invalid}
+        invalid={form.submitted && name.invalid}
         errorMessage={name.error}
         description="Введите название спринта"
       />
@@ -100,7 +94,7 @@
         label="Дата начала спринта"
         placeholder="ДД.ММ.ГГГГ"
         bind:value={startedAt.value}
-        invalid={submitted && startedAt.invalid}
+        invalid={form.submitted && startedAt.invalid}
         errorMessage={startedAt.error}
         description="Введите дату начала спринта"
       />
@@ -109,7 +103,7 @@
         label="Дата окончания спринта"
         placeholder="ДД.ММ.ГГГГ"
         bind:value={finishedAt.value}
-        invalid={submitted && finishedAt.invalid}
+        invalid={form.submitted && finishedAt.invalid}
         errorMessage={finishedAt.error}
         description="Введите дату окончания спринта"
       />

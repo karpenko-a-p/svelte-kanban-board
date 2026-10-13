@@ -19,13 +19,12 @@
 
   let { opened = $bindable(false), title, children, ...props }: Props = $props();
 
+  // Пользователь выделяет текст
+  let selecting = $state(false);
+
   // Обработка нажатия "Esc"
   $effect(() => {
-    const escapeHandle = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') {
-        close();
-      }
-    };
+    const escapeHandle = (event: KeyboardEvent): void => void (event.key === 'Escape' && close());
 
     // Регистрация и очистка обработчика
     window.addEventListener('keydown', escapeHandle);
@@ -34,7 +33,8 @@
 
   // Закрытие модального окна
   function close(): void {
-    opened = false;
+    if (!selecting) opened = false;
+    selecting = false;
   }
 </script>
 
@@ -46,10 +46,15 @@
     {...props}
     transition:fade|global
     class="fixed z-100 top-0 left-0 w-screen h-screen flex items-center justify-center bg-black/50"
-    onclick={close}
+    onmouseup={close}
   >
     <!-- Белая подложка -->
-    <section transition:scale|global class="paper w-150" onclick={stopPropagation}>
+    <section
+      transition:scale|global
+      class="paper w-150"
+      onclick={stopPropagation}
+      onmousedown={() => (selecting = true)}
+    >
       <header class="flex items-center justify-between">
         <!-- Заголовок -->
         <h3 class="font-bold">{title}</h3>
