@@ -1,5 +1,5 @@
-import { REDIS_URL } from '#app/core/server/env.server';
 import { RedisClient } from 'bun';
+import { REDIS_URL } from '#app/core/server/env.server';
 
 /**
  * Экземпляр Redis

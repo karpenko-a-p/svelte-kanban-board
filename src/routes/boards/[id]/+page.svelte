@@ -3,6 +3,7 @@
   import dayjs from 'dayjs';
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
+  import Track from '#view/components/kanban-board/Track.svelte';
   import Input from '#view/ui/Input/Input.svelte';
   import Modal from '#view/ui/Modal/Modal.svelte';
   import { SPRINTS_STORE } from '#app/store/slices/sprints';
@@ -17,6 +18,7 @@
   const { data }: PageProps = $props();
   let creation = $state(false);
   let validationErrors: string[] = $state([]);
+  let currentSprintId = $state('');
   const board = $derived(data.board);
 
   // Форма создания спринта
@@ -58,6 +60,11 @@
   // Поля формы
   const { name, startedAt, finishedAt } = form.fields;
 
+  // Выбор спринта
+  function selectSprint(sprintId: string): void {
+    currentSprintId = sprintId;
+  }
+
   // Открытие модального окна с созданием спринта
   function openCreation(): void {
     creation = true;
@@ -72,30 +79,47 @@
   <h1>{board?.name}</h1>
   <p class="secondary">{board?.description}</p>
 
-  <main class="mt-2 flex grow gap-4">
+  <main class="my-2 flex grow gap-4">
     <div class="flex flex-col basis-3xs">
       <button onclick={openCreation}>
         <IconPlus />
         Создать спринт
       </button>
 
-      <ul class="flex flex-col">
-        {#each sprintsStore.getSprints() as sprint (sprint.id)}
-          <li class="rounded-2xl mt-2">
-            <button class="ghost w-full flex-col gap-0 items-start text-start">
-              <div class="flex items-start text-wrap">
-                <p class="secondary mr-1 small">[{sprint.id}]</p>
-                <p class="small">{sprint.name}</p>
-              </div>
-              <p class="secondary small">Начало: {dayjs(sprint.startedAt).format('DD.MM.YYYY')}</p>
-              <p class="secondary small">Конец: {dayjs(sprint.finishedAt).format('DD.MM.YYYY')}</p>
-            </button>
-          </li>
-        {/each}
-      </ul>
+      <!-- Список спринтов -->
+      <div class="relative grow mt-2">
+        <ul class="flex flex-col absolute top-0 left-0 h-full w-full overflow-y-auto">
+          {#each sprintsStore.getSprints() as sprint (sprint.id)}
+            <li class="rounded-2xl">
+              <button
+                onclick={() => selectSprint(sprint.id)}
+                disabled={currentSprintId === sprint.id}
+                class={[
+                  'ghost w-full flex-col items-start text-start',
+                  currentSprintId === sprint.id && 'border-2 border-solid border-blue-500'
+                ]}
+              >
+                <div class="flex items-start text-wrap">
+                  <p class="secondary mr-1 small">[{sprint.id}]</p>
+                  <p class="small">{sprint.name}</p>
+                </div>
+                <p class="secondary small">Начало: {dayjs(sprint.startedAt).format('DD.MM.YYYY')}</p>
+                <p class="secondary small">Конец: {dayjs(sprint.finishedAt).format('DD.MM.YYYY')}</p>
+              </button>
+            </li>
+          {/each}
+        </ul>
+      </div>
     </div>
 
-    <div>Kanban</div>
+    <!-- Канбан доска -->
+    <section class="relative grow">
+      <div class="grid grid-cols-3 absolute top-0 left-0 h-full w-full overflow-y-auto gap-2">
+        <Track title="Ожидает" tasks={[]} />
+        <Track title="В работе" tasks={[]} />
+        <Track title="Выполнено" tasks={[]} />
+      </div>
+    </section>
   </main>
 </section>
 

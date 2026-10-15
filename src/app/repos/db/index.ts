@@ -3,3 +3,4 @@ export * from './DBUser';
 export * from './DbBoard';
 export * from './DbBoardsMembers';
 export * from './DbSprint';
+export * from './DbTask';

@@ -1,6 +1,6 @@
 import { diContainer, err, ok, type Res } from '#app/core/common';
 import { Sprint } from '#app/entities';
-import { postgres, redisSet, REDIS_HOUR, redisGet } from './utils';
+import { postgres, redisSet, REDIS_HOUR, redisGet, redis } from './utils';
 import type { DbSprint } from './db';
 
 /**
@@ -51,6 +51,8 @@ export class SprintsRepoImpl implements SprintsRepo {
     }
 
     redisSet(`sprint:${sprint.id}`, REDIS_HOUR, sprint);
+    redis.del(`sprints_by_board:${boardId}`);
+
     return ok(sprint);
   }
 
