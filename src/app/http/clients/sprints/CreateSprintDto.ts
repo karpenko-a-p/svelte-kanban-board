@@ -40,7 +40,9 @@ export class CreateSprintDto implements Validate {
   validate(): string[] {
     const errors = [];
 
-    if ( this.name.length <= 64) {
+    if (!this.name.length) {
+      errors.push('Не передано название спринта');
+    } else if (this.name.length > 64) {
       errors.push('Название должно быть до 64 символов включительно');
     }
 

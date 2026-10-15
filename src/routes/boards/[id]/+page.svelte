@@ -1,11 +1,12 @@
 <script lang="ts">
   import IconPlus from '@tabler/icons-svelte/icons/plus';
+  import dayjs from 'dayjs';
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
   import Input from '#view/ui/Input/Input.svelte';
   import Modal from '#view/ui/Modal/Modal.svelte';
   import { SPRINTS_STORE } from '#app/store/slices/sprints';
-  import { createSprint } from '#app/use-cases/sprints';
+  import { createSprint, fetchSprints } from '#app/use-cases/sprints';
   import { createForm } from '#view/form-validators/form.svelte';
   import { input } from '#view/form-validators/input.svelte';
   import { browser } from '$app/env';
@@ -18,6 +19,7 @@
   let validationErrors: string[] = $state([]);
   const board = $derived(data.board);
 
+  // Форма создания спринта
   const form = createForm({
     fields: {
       name: input('', {
@@ -26,17 +28,30 @@
       }),
       startedAt: input('', {
         required: [true, 'Обязательно для заполнения'],
-        matches: [/^\d{2}.\d{2}.\d{4}$/, 'Формат даты ДД.ММ.ГГГГ']
+        matches: [/^\d{4}\/\d{2}\/\d{2}$/, 'Формат даты ГГГГ/ММ/ДД']
       }),
       finishedAt: input('', {
         required: [true, 'Обязательно для заполнения'],
-        matches: [/^\d{2}.\d{2}.\d{4}$/, 'Формат даты ДД.ММ.ГГГГ']
+        matches: [/^\d{4}\/\d{2}\/\d{2}$/, 'Формат даты ГГГГ/ММ/ДД']
       })
     },
-    onsubmit(): void {
+    async onsubmit(): Promise<void> {
       // Создание нового спринта
-      const { name, finishedAt, startedAt } = form.fields;
-      createSprint(name.value, startedAt.value, finishedAt.value, board.id);
+      const createdSprint = await createSprint(
+        form.fields.name.value,
+        new Date(form.fields.startedAt.value).toISOString(),
+        new Date(form.fields.finishedAt.value).toISOString(),
+        board.id
+      );
+
+      if (createdSprint.isOk()) {
+        creation = false;
+        // TODO load kanban
+        return;
+      }
+
+      // Отображение ошибок
+      validationErrors = createdSprint.unwrapErr();
     }
   });
 
@@ -49,8 +64,8 @@
     form.reset();
   }
 
-  // Получение списка спринтов
-  onMount(() => console.log('will be soon'));
+  // Получение списка спринтов для открытой канбан доски
+  onMount(() => fetchSprints(board.id));
 </script>
 
 <section class="px-2 grow flex flex-col">
@@ -64,10 +79,17 @@
         Создать спринт
       </button>
 
-      <ul class="flex flex-col gap-2">
+      <ul class="flex flex-col">
         {#each sprintsStore.getSprints() as sprint (sprint.id)}
-          <li class="p-2 rounded-2xl">
-            {sprint.name}
+          <li class="rounded-2xl mt-2">
+            <button class="ghost w-full flex-col gap-0 items-start text-start">
+              <div class="flex items-start text-wrap">
+                <p class="secondary mr-1 small">[{sprint.id}]</p>
+                <p class="small">{sprint.name}</p>
+              </div>
+              <p class="secondary small">Начало: {dayjs(sprint.startedAt).format('DD.MM.YYYY')}</p>
+              <p class="secondary small">Конец: {dayjs(sprint.finishedAt).format('DD.MM.YYYY')}</p>
+            </button>
           </li>
         {/each}
       </ul>
@@ -92,7 +114,7 @@
 
       <Input
         label="Дата начала спринта"
-        placeholder="ДД.ММ.ГГГГ"
+        placeholder="ГГГГ/ММ/ДД"
         bind:value={startedAt.value}
         invalid={form.submitted && startedAt.invalid}
         errorMessage={startedAt.error}
@@ -101,7 +123,7 @@
 
       <Input
         label="Дата окончания спринта"
-        placeholder="ДД.ММ.ГГГГ"
+        placeholder="ГГГГ/ММ/ДД"
         bind:value={finishedAt.value}
         invalid={form.submitted && finishedAt.invalid}
         errorMessage={finishedAt.error}

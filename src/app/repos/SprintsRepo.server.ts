@@ -1,7 +1,7 @@
 import { diContainer, err, ok, type Res } from '#app/core/common';
 import { Sprint } from '#app/entities';
+import { postgres, redisSet, REDIS_HOUR, redisGet } from './utils';
 import type { DbSprint } from './db';
-import { postgres, REDIS_HOUR, redisGet, redisSet } from './utils';
 
 /**
  * Репозиторий для работы со спринтами
@@ -70,7 +70,9 @@ export class SprintsRepoImpl implements SprintsRepo {
       select id, name, started_at, finished_at from sprints
       where board_id = ${boardId}`;
 
-    const sprints = rows.map(Sprint.tryParse).removeNil();
+    const sprints = rows
+      .map((row) => Sprint.new(row.id, row.name, row.started_at.toISOString(), row.finished_at.toISOString()))
+      .removeNil();
 
     redisSet(cacheKey, REDIS_HOUR, sprints);
     return sprints;

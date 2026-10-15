@@ -9,45 +9,61 @@
 
   let register = $state(true);
   let agreed = $state(false);
-  let validationErrors = $state<string[]>([]);
+  let validationErrors: string[] = $state([]);
 
-  const form = createForm({
+  // Поля форм
+  const login = input('', {
+    required: [true, 'Обязательно для заполнения'],
+    maxLength: [32, 'Максимальная длинна 32 символа'],
+    minLength: [6, 'Минимальная длинна 6 символов']
+  });
+
+  const fio = input('', {
+    required: [true, 'Обязательно для заполнения'],
+    maxLength: [64, 'Максимальная длинна 64 символа'],
+    minLength: [5, 'Минимальная длинна 5 символов']
+  });
+
+  const password = input('', {
+    required: [true, 'Обязательно для заполнения'],
+    maxLength: [128, 'Максимальная длинна 128 символа'],
+    minLength: [6, 'Минимальная длинна 6 символов']
+  });
+
+  // Форма для регистрации пользователя
+  const registerForm = createForm({
     fields: {
-      login: input('', {
-        required: [true, 'Обязательно для заполнения'],
-        maxLength: [32, 'Максимальная длинна 32 символа'],
-        minLength: [6, 'Минимальная длинна 6 символов']
-      }),
-      fio: input('', {
-        required: [true, 'Обязательно для заполнения'],
-        maxLength: [64, 'Максимальная длинна 64 символа'],
-        minLength: [5, 'Минимальная длинна 5 символов']
-      }),
-      password: input('', {
-        required: [true, 'Обязательно для заполнения'],
-        maxLength: [128, 'Максимальная длинна 128 символа'],
-        minLength: [6, 'Минимальная длинна 6 символов']
-      })
+      login,
+      fio,
+      password
     },
-    // Авторизация пользователя в системе
-    async onsubmit(): Promise<void> {
-      // Для регистрации нужно соглашение
-      if (register && !agreed) return;
-
-      const { login, fio, password } = form.fields;
-
-      // Пользователь впервые регистрируется в системе
-      const auth = register
-        ? await registerUser(login.value, fio.value, password.value)
-        : await loginUser(login.value, password.value);
-
-      // Отображение ошибки при наличии, иначе перевод на экран с досками
-      auth.andThen(() => goto('/boards', { refreshAll: true })).orElse((err) => (validationErrors = err));
+    // Регистрация
+    onsubmit(): void {
+      // Необходимо соглашение
+      if (!agreed) return;
+      registerUser(login.value, fio.value, password.value).then(handleAuth);
     }
   });
 
-  // Поля формы
-  const { login, fio, password } = form.fields;
+  // Форма для авторизации пользователя
+  const loginForm = createForm({
+    fields: {
+      login,
+      password
+    },
+    // Авторизация
+    onsubmit(): void {
+      loginUser(login.value, password.value).then(handleAuth);
+    }
+  });
+
+  // Текущая форма
+  const form = $derived(register ? registerForm : loginForm);
+
+  // Отображение ошибки при наличии, иначе перевод на экран с досками
+  function handleAuth(auth: Awaited<ReturnType<typeof registerUser>>): void {
+    auth.andThen(() => goto('/boards', { refreshAll: true })).orElse((err) => (validationErrors = err));
+  }
 
   // Переключение между регистрацией и авторизацией
   function switchAuth(): void {

@@ -12,8 +12,8 @@ services:
       POSTGRES_USER: admin
       POSTGRES_DB: my_database
       PGDATA: /var/lib/postgresql/data/pgdata
-      PGTZ: 'Europe/Moscow'
-      TZ: 'Europe/Moscow'
+      PGTZ: 'UTC'
+      TZ: 'UTC'
 
   redis:
     image: redis:8.6-alpine3.23
