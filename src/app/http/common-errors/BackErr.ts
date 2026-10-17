@@ -15,6 +15,11 @@ export abstract class BackErr extends Locker<'BackErr'> {
   static readonly InvalidEntity = class extends BackErr {};
 
   /**
+   * Не найдено
+   */
+  static readonly NotFound = class extends BackErr {};
+
+  /**
    * Ошибка валидации
    */
   static readonly Validation = class extends BackErr {

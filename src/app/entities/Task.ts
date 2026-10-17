@@ -53,7 +53,9 @@ export class Task implements ToPlain {
     public name: string,
     public description: string,
     public status: TaskStatus,
-    public priority: TaskPriority
+    public priority: TaskPriority,
+    public reporter: string,
+    public assigned: string
   ) {}
 
   /**
@@ -68,7 +70,9 @@ export class Task implements ToPlain {
         isString(entity.name) &&
         isString(entity.description) &&
         isEnum(TaskStatus, entity.status) &&
-        isEnum(TaskPriority, entity.priority))
+        isEnum(TaskPriority, entity.priority) &&
+        isString(entity.reporter) &&
+        isString(entity.assigned))
     );
   }
 
@@ -77,16 +81,30 @@ export class Task implements ToPlain {
    * @param id - идентификатор
    * @param name - наименование доски
    * @param description - описание
+   * @param status - статус
+   * @param priority - приоритет
+   * @param reporter - создатель задачи
+   * @param assigned - назначенный для выполнения
    */
-  static new(id: string, name: string, description: string, status: TaskStatus, priority: TaskPriority): Maybe<Task> {
+  static new(
+    id: string,
+    name: string,
+    description: string,
+    status: TaskStatus,
+    priority: TaskPriority,
+    reporter: string,
+    assigned: string
+  ): Maybe<Task> {
     if (
       isString(id) &&
       isString(name) &&
       isString(description) &&
       isEnum(TaskStatus, status) &&
-      isEnum(TaskPriority, priority)
+      isEnum(TaskPriority, priority) &&
+      isString(reporter) &&
+      isString(assigned)
     ) {
-      return new Task(id, name, description, status, priority);
+      return new Task(id, name, description, status, priority, reporter, assigned);
     }
   }
 
@@ -96,7 +114,7 @@ export class Task implements ToPlain {
    */
   static from(task: Task): Maybe<Task> {
     if (task instanceof Task) {
-      return new Task(task.id, task.name, task.description, task.status, task.priority);
+      return new Task(task.id, task.name, task.description, task.status, task.priority, task.reporter, task.assigned);
     }
   }
 
@@ -106,7 +124,7 @@ export class Task implements ToPlain {
    */
   static tryParse(entity: unknown): Maybe<Task> {
     if (Task.isExtends(entity)) {
-      return new Task(entity.id, entity.name, entity.description, entity.status, entity.priority);
+      return new Task(entity.id, entity.name, entity.description, entity.status, entity.priority, entity.reporter, entity.assigned);
     }
   }
 

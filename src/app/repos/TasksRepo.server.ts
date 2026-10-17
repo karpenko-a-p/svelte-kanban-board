@@ -1,7 +1,7 @@
-import { diContainer, type Res } from '#app/core/common';
-import { postgres } from './utils';
-import { TaskPriority, type Task, type TaskStatus } from '#app/entities';
-import { DbTaskPriority, type DbTask } from './db';
+import { diContainer, err, ok, panic, type Res } from '#app/core/common';
+import { TaskPriority, Task, TaskStatus } from '#app/entities';
+import { DbTaskPriority, DbTaskStatus, type DbTask } from './db';
+import { postgres, redis, REDIS_HOUR, redisGet, redisSet } from './utils';
 
 /**
  * DTO данных для создания задачи
@@ -55,19 +55,43 @@ class TasksRepoImpl implements TasksRepo {
     if (dbPriority === DbTaskPriority.High) return TaskPriority.High;
     if (dbPriority === DbTaskPriority.Medium) return TaskPriority.Medium;
     if (dbPriority === DbTaskPriority.Low) return TaskPriority.Low;
-    throw new TypeError('Не удалось удалось преобразовать приоритет задачи (DbTaskPriority -> TaskPriority)');
+    panic('Не удалось удалось преобразовать приоритет задачи (DbTaskPriority -> TaskPriority)');
   }
 
   /**
    * Приведение приоритета задачи модели к сущности в БД
-   * @param dbPriority - приоритет задачи модели
+   * @param priority - приоритет задачи модели
    * @returns приоритет задачи в БД
    */
-  private static dbPriorityParse(dbPriority: TaskPriority): DbTaskPriority {
-    if (dbPriority === TaskPriority.High) return DbTaskPriority.High;
-    if (dbPriority === TaskPriority.Medium) return DbTaskPriority.Medium;
-    if (dbPriority === TaskPriority.Low) return DbTaskPriority.Low;
-    throw new TypeError('Не удалось удалось преобразовать приоритет задачи (TaskPriority -> DbTaskPriority)');
+  private static dbPriorityParse(priority: TaskPriority): DbTaskPriority {
+    if (priority === TaskPriority.High) return DbTaskPriority.High;
+    if (priority === TaskPriority.Medium) return DbTaskPriority.Medium;
+    if (priority === TaskPriority.Low) return DbTaskPriority.Low;
+    panic('Не удалось удалось преобразовать приоритет задачи (TaskPriority -> DbTaskPriority)');
+  }
+
+  /**
+   * Приведение статуса задачи из сущности в БД к модели
+   * @param dbStatus - статус задачи из БД
+   * @returns статус задачи для модели
+   */
+  private static statusParse(dbStatus: DbTaskStatus): TaskStatus {
+    if (dbStatus === DbTaskStatus.Done) return TaskStatus.Done;
+    if (dbStatus === DbTaskStatus.InProgress) return TaskStatus.InProgress;
+    if (dbStatus === DbTaskStatus.NotStarted) return TaskStatus.NotStarted;
+    panic('Не удалось удалось преобразовать статус задачи (DbTaskStatus -> TaskStatus)');
+  }
+
+  /**
+   * Приведение статуса задачи модели к сущности в БД
+   * @param status - статус задачи модели
+   * @returns статус задачи в БД
+   */
+  private static dbStatusParse(status: TaskStatus): DbTaskStatus {
+    if (status === TaskStatus.Done) return DbTaskStatus.Done;
+    if (status === TaskStatus.InProgress) return DbTaskStatus.InProgress;
+    if (status === TaskStatus.NotStarted) return DbTaskStatus.NotStarted;
+    panic('Не удалось удалось преобразовать статус задачи (TaskStatus -> DbTaskStatus)');
   }
 
   /**
@@ -75,28 +99,154 @@ class TasksRepoImpl implements TasksRepo {
    * @see {TasksRepo.createTask}
    */
   async createTask(dto: CreateTaskDto): Promise<Res<Task, string>> {
-    const [row] = await postgres<DbTask[]>`
+    const [{ id: createdTaskId = null }] = await postgres<Pick<DbTask, 'id'>[]>`
       insert into tasks (name, description, priority, sprint_id, reporter_id, assigned_id)
       values (${dto.name}, ${dto.description}, ${TasksRepoImpl.dbPriorityParse(dto.priority)}, ${dto.sprintId}, ${dto.reporterId}, ${dto.assignedId})
-      returning id, name, description, status, priority, sprint_id, reporter_id, assigned_id`;
+      returning id`;
 
-    // TODO
+    if (!createdTaskId) {
+      return err('Внутренняя ошибка при создании задачи');
+    }
+
+    const [row = null] = await postgres<(DbTask & { reporter: string; assigned: string })[]>`
+      select
+        t.id,
+        t.name,
+        t.description,
+        t.status,
+        t.priority,
+        t.sprint_id,
+        u_r.fio reporter,
+        u_a.fio assigned
+      from tasks t
+      left join users u_r on u_r.id = t.reporter_id
+      left join users u_a on u_a.id = t.assigned_id
+      where t.id = ${createdTaskId}
+      limit 1`;
+
+    if (!row) {
+      return err('Внутренняя ошибка при создании задачи');
+    }
+
+    const task = Task.new(
+      row.id,
+      row.name,
+      row.description,
+      TasksRepoImpl.statusParse(row.status),
+      TasksRepoImpl.priorityParse(row.priority),
+      row.reporter,
+      row.assigned
+    );
+
+    if (!task) {
+      return err('Ошибка приведения сущности DbTask к модели Task');
+    }
+
+    redisSet(`task:${task.id}`, REDIS_HOUR, task);
+    redis.del(`tasks_by_sprint:${row.sprint_id}`);
+
+    return ok(task);
   }
 
   /**
    * @inheritdoc
    * @see {TasksRepo.getTasksBySprintId}
    */
-  getTasksBySprintId(sprintId: string): Promise<Task[]> {
-    throw new Error('Method not implemented.');
+  async getTasksBySprintId(sprintId: string): Promise<Task[]> {
+    const cacheKey = `tasks_by_sprint:${sprintId}`;
+    const cachedTasks = await redisGet<Task[]>(cacheKey);
+
+    if (cachedTasks !== undefined) {
+      return cachedTasks?.map(Task.tryParse).removeNil() ?? [];
+    }
+
+    const rows = await postgres<(DbTask & { reporter: string; assigned: string })[]>`
+      select
+        t.id,
+        t.name,
+        t.description,
+        t.status,
+        t.priority,
+        t.sprint_id,
+        u_r.fio reporter,
+        u_a.fio assigned
+      from tasks t
+      left join users u_r on u_r.id = t.reporter_id
+      left join users u_a on u_a.id = t.assigned_id
+      where t.sprint_id = ${sprintId}`;
+
+    const tasks = rows
+      .map((row) =>
+        Task.new(
+          row.id,
+          row.name,
+          row.description,
+          TasksRepoImpl.statusParse(row.status),
+          TasksRepoImpl.priorityParse(row.priority),
+          row.reporter,
+          row.assigned
+        )
+      )
+      .removeNil();
+
+    redisSet(cacheKey, REDIS_HOUR, tasks);
+
+    return tasks;
   }
 
   /**
    * @inheritdoc
    * @see {TasksRepo.updateTaskStatus}
    */
-  updateTaskStatus(taskId: string, status: TaskStatus): Promise<Res<Task, string>> {
-    throw new Error('Method not implemented.');
+  async updateTaskStatus(taskId: string, status: TaskStatus): Promise<Res<Task, string>> {
+    const [updated = null] = await postgres<Pick<DbTask, 'id' | 'sprint_id'>[]>`
+      update tasks
+      set status = ${TasksRepoImpl.dbStatusParse(status)}
+      where id = ${taskId}
+      returning id, sprint_id`;
+
+    if (!updated) {
+      return err('Задача не найдена');
+    }
+
+    const [row = null] = await postgres<(DbTask & { reporter: string; assigned: string })[]>`
+      select
+        t.id,
+        t.name,
+        t.description,
+        t.status,
+        t.priority,
+        t.sprint_id,
+        u_r.fio reporter,
+        u_a.fio assigned
+      from tasks t
+      left join users u_r on u_r.id = t.reporter_id
+      left join users u_a on u_a.id = t.assigned_id
+      where t.id = ${updated.id}
+      limit 1`;
+
+    if (!row) {
+      return err('Внутренняя ошибка при обновлении задачи');
+    }
+
+    const task = Task.new(
+      row.id,
+      row.name,
+      row.description,
+      TasksRepoImpl.statusParse(row.status),
+      TasksRepoImpl.priorityParse(row.priority),
+      row.reporter,
+      row.assigned
+    );
+
+    if (!task) {
+      return err('Ошибка приведения сущности DbTask к модели Task');
+    }
+
+    redisSet(`task:${task.id}`, REDIS_HOUR, task);
+    redis.del(`tasks_by_sprint:${updated.sprint_id}`, `task:${taskId}`);
+
+    return ok(task);
   }
 }
 

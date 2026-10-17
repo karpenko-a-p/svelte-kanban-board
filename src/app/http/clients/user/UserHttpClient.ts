@@ -1,5 +1,4 @@
 import { diContainer, err, ok, type Res } from '#app/core/common';
-import type { User } from '#app/entities';
 import { ErrorDto, InvalidEntityErrorDto, ValidationErrorDto } from '#app/http/common-dtos';
 import { BackErr, HttpErr } from '#app/http/common-errors';
 import { USER_EXISTS_ERR, USER_NOT_EXISTS_ERR } from '#app/http/constants';
@@ -9,6 +8,7 @@ import { LoginUserDto } from './LoginUserDto';
 import { RegisterErr } from './RegisterErr';
 import { RegisterUserDto } from './RegisterUserDto';
 import { UserDto } from './UserDto';
+import type { User } from '#app/entities';
 
 /**
  * HTTP клиент для работы с api пользователей

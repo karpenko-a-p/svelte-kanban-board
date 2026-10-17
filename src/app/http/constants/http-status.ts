@@ -19,6 +19,11 @@ export const FOUND = 302;
 export const BAD_REQUEST = 400;
 
 /**
+ * Не найдено
+ */
+export const NOT_FOUND = 404;
+
+/**
  * Пользователь не авторизован
  */
 export const UNAUTHORIZED = 401;

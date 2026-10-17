@@ -5,6 +5,7 @@ import {
   FORBIDDEN,
   FOUND,
   INTERNAL_SERVER_ERROR,
+  NOT_FOUND,
   OK,
   UNAUTHORIZED,
   UNPROCESSABLE_ENTITY
@@ -41,6 +42,13 @@ class SmartResponse extends Response {
    */
   get isBadRequest(): boolean {
     return this.status === BAD_REQUEST;
+  }
+
+  /**
+   * Проверка статуса на NOT_FOUND
+   */
+  get isNotFound(): boolean {
+    return this.status === NOT_FOUND;
   }
 
   /**
