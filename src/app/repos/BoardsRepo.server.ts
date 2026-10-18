@@ -65,6 +65,14 @@ export interface BoardsRepo {
    * @returns флаг наличия доступа
    */
   checkIsMember(boardId: string, userId: string): Promise<boolean>;
+
+  /**
+   * Провверка что спринт принадлежит к определенной доске
+   * @param boardId - идентификатор канбан доски
+   * @param sprintId - идентификатор спринта
+   * @returns статус принадлежности
+   */
+  checkBoardOwnsSprint(boardId: string, sprintId: string): Promise<boolean>;
 }
 
 /**
@@ -217,6 +225,20 @@ export class BoardsRepoImpl implements BoardsRepo {
     redisSet(cacheKey, REDIS_HOUR, isMember);
 
     return isMember;
+  }
+
+  /**
+   * @inheritdoc
+   * @see {BoardsRepo.checkBoardOwnsSprint}
+   */
+  async checkBoardOwnsSprint(boardId: string, sprintId: string): Promise<boolean> {
+    const [row = null] = await postgres<[{ owns: boolean }]>`
+      select 1::bool as owns from boards b
+      join sprints s on b.id = s.board_id
+      where b.id = ${boardId} and s.id = ${sprintId}
+      limit 1`;
+
+    return !!row?.owns;
   }
 }
 

@@ -3,6 +3,7 @@ import { SPRINTS_HTTP_CLIENT } from '#app/http/clients/sprints';
 import { BackErr } from '#app/http/common-errors';
 import { NOTIFICATION_STORE, NotificationType } from '#app/store/slices/notification';
 import { SPRINTS_STORE } from '#app/store/slices/sprints';
+import type { Sprint } from '#app/entities';
 
 /**
  * Сценарий создания нового спринта
@@ -17,7 +18,7 @@ export async function createSprint(
   startedAt: string,
   finishedAt: string,
   boardId: string
-): Promise<Res<null, string[]>> {
+): Promise<Res<Sprint, string[]>> {
   const sprintsHttpClient = SPRINTS_HTTP_CLIENT.get();
   const sprintsStore = SPRINTS_STORE.get();
   const notificationStore = NOTIFICATION_STORE.get();
@@ -29,7 +30,7 @@ export async function createSprint(
   if (createdSprint.isOk()) {
     notificationStore.addNotification('Создан новый спринт', NotificationType.Success);
     sprintsStore.addSprint(createdSprint.unwrap());
-    return ok(null);
+    return ok(createdSprint.unwrap());
   }
 
   // Уведомление об ошибке

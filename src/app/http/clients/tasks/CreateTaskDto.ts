@@ -13,6 +13,7 @@ export class CreateTaskDto implements Validate {
    * @param sprintId - идентификатор спринта
    * @param reporterId - идентификатор автора задачи
    * @param assignedId - идентификатор исполнителя
+   * @param boardId - идентификатор канбан доски
    */
   constructor(
     readonly name: string,
@@ -20,7 +21,8 @@ export class CreateTaskDto implements Validate {
     readonly priority: TaskPriority,
     readonly sprintId: string,
     readonly reporterId: string,
-    readonly assignedId: string
+    readonly assignedId: string,
+    readonly boardId: string
   ) {}
 
   /**
@@ -36,7 +38,8 @@ export class CreateTaskDto implements Validate {
       isEnum(TaskPriority, dto.priority) &&
       isString(dto.sprintId) &&
       isString(dto.reporterId) &&
-      isString(dto.assignedId)
+      isString(dto.assignedId) &&
+      isString(dto.boardId)
     ) {
       return new CreateTaskDto(
         dto.name,
@@ -44,7 +47,8 @@ export class CreateTaskDto implements Validate {
         dto.priority as TaskPriority,
         dto.sprintId,
         dto.reporterId,
-        dto.assignedId
+        dto.assignedId,
+        dto.boardId
       );
     }
   }
@@ -67,6 +71,18 @@ export class CreateTaskDto implements Validate {
 
     if (!this.sprintId) {
       errors.push('Не передан идентификатор спринта');
+    }
+
+    if (!this.reporterId) {
+      errors.push('Не передан идентификатор автора задачи');
+    }
+
+    if (!this.assignedId) {
+      errors.push('Не передан идентификатор исполнителя');
+    }
+
+    if (!this.boardId) {
+      errors.push('Не передан идентификатор канбан доски');
     }
 
     return errors;

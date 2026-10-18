@@ -53,6 +53,14 @@ export class TaskDto {
   }
 
   /**
+   * Парсинг сущности задачи к DTO задачи
+   * @param sprint - модель задачи
+   */
+  static fromTask(task: Task): TaskDto {
+    return new TaskDto(task.id, task.name, task.description, task.status, task.priority, task.reporter, task.assigned);
+  }
+
+  /**
    * Приведение DTO к сущности задачи
    * @returns сущность задачи
    */

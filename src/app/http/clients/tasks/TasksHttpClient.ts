@@ -19,10 +19,11 @@ export interface TasksHttpClient {
 
   /**
    * Получение задач по определённому спринту
+   * @param boardId - идентификатор канбан доски
    * @param sprintId - идентификатор спринта
    * @returns массив тасок
    */
-  getTasksBySprintId(sprintId: string): Promise<Res<Task[], BackErr | HttpErr>>;
+  getTasksBySprintId(boardId: string, sprintId: string): Promise<Res<Task[], BackErr | HttpErr>>;
 
   /**
    * Обновление статуса задачи
@@ -91,8 +92,8 @@ class TasksHttpClientImpl implements TasksHttpClient {
    * @inheritdoc
    * @see {TasksHttpClient.getTasksBySprintId}
    */
-  async getTasksBySprintId(sprintId: string): Promise<Res<Task[], BackErr | HttpErr>> {
-    const response = await request(`/api/v1/tasks?sprint-id=${sprintId}`, {
+  async getTasksBySprintId(boardId: string, sprintId: string): Promise<Res<Task[], BackErr | HttpErr>> {
+    const response = await request(`/api/v1/tasks?board-id=${boardId}&sprint-id=${sprintId}`, {
       method: 'GET',
       headers: ReqHeaders.default().build()
     });

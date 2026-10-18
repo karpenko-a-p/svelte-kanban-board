@@ -34,7 +34,7 @@
 {/snippet}
 
 {#if user}
-  <section class="bg-gray-200 p-1 rounded-2xl cursor-pointer flex flex-col absolute top-2 left-1/2 -translate-x-1/2">
+  <section class="bg-gray-200 p-1 rounded-2xl cursor-pointer flex flex-col absolute z-10 top-2 left-1/2 -translate-x-1/2">
     <!-- ФИО -->
     <button class="secondary small rounded-xl group" onclick={full.toggle}>
       <IconUser size={20} class="group-hover:stroke-blue-500 transition" />

@@ -1,9 +1,9 @@
 <script lang="ts">
   import '#src/app.css';
   import IconKanban from '@tabler/icons-svelte/icons/layout-kanban-filled';
-  import Notifications from '#view/components/level-1/Notifications.svelte';
-  import NotificationsToggleButton from '#view/components/level-1/NotificationsToggleButton.svelte';
-  import ProfileWidget from '#view/components/level-1/ProfileWidget.svelte';
+  import Notifications from '#view/components/notifications/Notifications.svelte';
+  import NotificationsToggleButton from '#view/components/notifications/NotificationsToggleButton.svelte';
+  import ProfileWidget from '#view/components/user/ProfileWidget.svelte';
   import { browser } from '$app/env';
   import type { LayoutProps } from './$types';
 
