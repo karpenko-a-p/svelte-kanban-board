@@ -15,7 +15,7 @@
   import { TASKS_STORE } from '#app/store/slices/tasks';
   import { getBoardMembers } from '#app/use-cases/boards';
   import { createSprint, fetchSprints } from '#app/use-cases/sprints';
-  import { createTask, fetchTasks } from '#app/use-cases/tasks';
+  import { createTask, fetchTasks, updateTaskStatus } from '#app/use-cases/tasks';
   import { browser } from '$app/env';
   import { page } from '$app/state';
   import type { PageProps } from '#svelte-kit/boards/[id]/$types';
@@ -29,7 +29,7 @@
   let taskCreation = $state(false);
   let currentSprintId = $state('');
   const board = $derived(data.board);
-  const user = $derived(page.data.user);
+  const user = $derived(page.data.user)!;
 
   // Сценарий создания новог спринта
   async function createSprintScenario(
@@ -68,7 +68,7 @@
       description,
       priority,
       assignedId,
-      reporterId: user!.id,
+      reporterId: user.id,
       boardId: board.id,
       sprintId: currentSprintId
     });
@@ -159,18 +159,39 @@
 
           <!-- Список задач -->
           <main class="grid grid-cols-3 gap-2 grow">
+            <!-- Ожидает -->
             <Track title="Ожидает" tasks={tasksStore.getByStatus(TaskStatus.NotStarted)}>
               {#snippet icon()}
                 <IconNotebook />
               {/snippet}
+
+              {#snippet button(taskId)}
+                <button
+                  class="small secondary py-1 text-xs"
+                  onclick={() => updateTaskStatus(board.id, taskId, TaskStatus.InProgress)}
+                >
+                  В работу
+                </button>
+              {/snippet}
             </Track>
 
+            <!-- В работе -->
             <Track title="В работе" tasks={tasksStore.getByStatus(TaskStatus.InProgress)}>
               {#snippet icon()}
                 <IconBriefcase2 />
               {/snippet}
+
+              {#snippet button(taskId)}
+                <button
+                  class="small secondary py-1 text-xs"
+                  onclick={() => updateTaskStatus(board.id, taskId, TaskStatus.Done)}
+                >
+                  Выполнено
+                </button>
+              {/snippet}
             </Track>
 
+            <!-- Выполнено -->
             <Track title="Выполнено" tasks={tasksStore.getByStatus(TaskStatus.Done)}>
               {#snippet icon()}
                 <IconCheck />

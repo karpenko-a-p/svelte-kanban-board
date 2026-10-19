@@ -1,6 +1,4 @@
-import { redirect } from '@sveltejs/kit';
 import { toPlain } from '#app/core/common';
-import { FOUND } from '#app/http/constants';
 import { BOARDS_REPO } from '#app/repos';
 import type { PageServerLoad } from '#svelte-kit/boards/$types';
 
@@ -12,13 +10,8 @@ const boardsRepo = BOARDS_REPO.get();
  * @returns массив канбан досок
  */
 export const load: PageServerLoad = async ({ locals }) => {
-  // Пользователь не авторизован
-  if (!locals.userId) {
-    redirect(FOUND, '/');
-  }
-
   // Получение канбан досок
-  const boards = await boardsRepo.getBoardsByUserId(locals.userId);
+  const boards = await boardsRepo.getBoardsByUserId(locals.userId!);
   const plainBoards = boards.map(toPlain);
 
   return { plainBoards };

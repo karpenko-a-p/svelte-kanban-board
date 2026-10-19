@@ -80,6 +80,14 @@ export interface BoardsRepo {
    * @returns статус принадлежности
    */
   checkBoardOwnsSprint(boardId: string, sprintId: string): Promise<boolean>;
+
+  /**
+   * Провверка что задача принадлежит к определенной доске
+   * @param boardId - идентификатор канбан доски
+   * @param taskId - идентификатор задачи
+   * @returns статус принадлежности
+   */
+  checkBoardOwnsTask(boardId: string, taskId: string): Promise<boolean>;
 }
 
 /**
@@ -268,6 +276,21 @@ export class BoardsRepoImpl implements BoardsRepo {
       select 1::bool as owns from boards b
       join sprints s on b.id = s.board_id
       where b.id = ${boardId} and s.id = ${sprintId}
+      limit 1`;
+
+    return !!row?.owns;
+  }
+
+  /**
+   * @inheritdoc
+   * @see {BoardsRepo.checkBoardOwnsTask}
+   */
+  async checkBoardOwnsTask(boardId: string, taskId: string): Promise<boolean> {
+    const [row = null] = await postgres<[{ owns: boolean }]>`
+      select 1::bool as owns from boards b
+      join sprints s on b.id = s.board_id
+      join tasks t on t.sprint_id = s.id
+      where b.id = ${boardId} and t.id = ${taskId}
       limit 1`;
 
     return !!row?.owns;

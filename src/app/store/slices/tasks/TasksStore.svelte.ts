@@ -1,5 +1,5 @@
 import { diContainer } from '#app/core/common';
-import type { Task, TaskStatus } from '#app/entities';
+import { Task, type TaskStatus } from '#app/entities';
 import type { Clearable } from '#app/store/interfaces';
 
 /**
@@ -30,6 +30,13 @@ export interface TasksStore extends Clearable {
    * @returns массив задач
    */
   getByStatus(status: TaskStatus): Task[];
+
+  /**
+   * Обновление статуса задачи
+   * @param taskId - идентификатор задачи
+   * @param status - устанавливаемый статус
+   */
+  updateTaskStatus(taskId: string, status: TaskStatus): void;
 }
 
 /**
@@ -71,6 +78,20 @@ class TasksStoreImpl implements TasksStore {
    */
   getByStatus(status: TaskStatus): Task[] {
     return this.tasks.filter((task) => task.status === status);
+  }
+
+  /**
+   * @inheritdoc
+   * @see {TasksStore.updateTaskStatus}
+   */
+  updateTaskStatus(taskId: string, status: TaskStatus): void {
+    const taskIndex = this.tasks.findIndex((task) => task.id === taskId);
+
+    if (taskIndex !== -1) {
+      const newTask = Task.from(this.tasks[taskIndex])!;
+      newTask.status = status;
+      this.tasks[taskIndex] = newTask;
+    }
   }
 
   /**

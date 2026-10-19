@@ -2,9 +2,10 @@ import { diContainer, err, ok, type Res } from '#app/core/common';
 import { InvalidEntityErrorDto, ValidationErrorDto } from '#app/http/common-dtos';
 import { BackErr, HttpErr } from '#app/http/common-errors';
 import { ReqHeaders, request } from '#app/http/utils';
+import { CreateTaskDto } from './CreateTaskDto';
 import { TaskDto } from './TaskDto';
+import { UpdateTaskStatusDto } from './UpdateTaskStatusDto';
 import type { Task, TaskStatus } from '#app/entities';
-import type { CreateTaskDto } from './CreateTaskDto';
 
 /**
  * HTTP клиент для работы с api задач
@@ -27,11 +28,12 @@ export interface TasksHttpClient {
 
   /**
    * Обновление статуса задачи
+   * @param boardId - идентификатор канбан доски
    * @param taskId - идентификатор задачи
    * @param status - устанавливаемый статус
    * @returns обновленная таска или сообщение об ошибке
    */
-  updateTaskStatus(taskId: string, status: TaskStatus): Promise<Res<Task, BackErr | HttpErr>>;
+  updateTaskStatus(boardId: string, taskId: string, status: TaskStatus): Promise<Res<Task, BackErr | HttpErr>>;
 }
 
 /**
@@ -46,7 +48,7 @@ class TasksHttpClientImpl implements TasksHttpClient {
     const response = await request('/api/v1/tasks', {
       method: 'POST',
       headers: ReqHeaders.default().build(),
-      body: JSON.stringify(dto)
+      body: JSON.stringify(CreateTaskDto.tryParse(dto))
     });
 
     // Ошибка сети
@@ -130,11 +132,11 @@ class TasksHttpClientImpl implements TasksHttpClient {
    * @inheritdoc
    * @see {TasksHttpClient.updateTaskStatus}
    */
-  async updateTaskStatus(taskId: string, status: TaskStatus): Promise<Res<Task, BackErr | HttpErr>> {
-    const response = await request(`/api/v1/tasks/${taskId}/status`, {
+  async updateTaskStatus(boardId: string, taskId: string, status: TaskStatus): Promise<Res<Task, BackErr | HttpErr>> {
+    const response = await request(`/api/v1/tasks/${taskId}?board-id=${boardId}`, {
       method: 'PATCH',
       headers: ReqHeaders.default().build(),
-      body: JSON.stringify({ status })
+      body: JSON.stringify(new UpdateTaskStatusDto(status))
     });
 
     // Ошибка сети
