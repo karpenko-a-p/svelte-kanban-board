@@ -1,5 +1,5 @@
 import { diContainer } from '#app/core/common';
-import type { Task } from '#app/entities';
+import type { Task, TaskStatus } from '#app/entities';
 import type { Clearable } from '#app/store/interfaces';
 
 /**
@@ -23,6 +23,13 @@ export interface TasksStore extends Clearable {
    * @param task - добавляемый задача
    */
   addTask(task: Task): void;
+
+  /**
+   * Получение списка спринтов по статусу
+   * @param status - статус задач
+   * @returns массив задач
+   */
+  getByStatus(status: TaskStatus): Task[];
 }
 
 /**
@@ -60,6 +67,14 @@ class TasksStoreImpl implements TasksStore {
 
   /**
    * @inheritdoc
+   * @see {TasksStore.getByStatus}
+   */
+  getByStatus(status: TaskStatus): Task[] {
+    return this.tasks.filter((task) => task.status === status);
+  }
+
+  /**
+   * @inheritdoc
    * @see {Clearable.clear}
    */
   clear(): void {
@@ -70,4 +85,4 @@ class TasksStoreImpl implements TasksStore {
 /**
  * Регистрация в DI
  */
-export const TASKS_STORE = diContainer.register(TasksStoreImpl.name, new TasksStoreImpl());
+export const TASKS_STORE = diContainer.register<TasksStore>(TasksStoreImpl.name, new TasksStoreImpl());

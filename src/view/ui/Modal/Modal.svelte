@@ -40,13 +40,14 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- eslint-disable @typescript-eslint/explicit-function-return-type -->
 
 {#if opened}
   <div
     {...props}
     transition:fade|global
     class="fixed z-100 top-0 left-0 w-screen h-screen flex items-center justify-center bg-black/50"
-    onmouseup={close}
+    onmouseup={(e) => e.currentTarget === e.target && close()}
   >
     <!-- Белая подложка -->
     <section
@@ -54,6 +55,7 @@
       class="paper w-150"
       onclick={stopPropagation}
       onmousedown={() => (selecting = true)}
+      onmouseup={() => (selecting = false)}
     >
       <header class="flex items-center justify-between">
         <!-- Заголовок -->

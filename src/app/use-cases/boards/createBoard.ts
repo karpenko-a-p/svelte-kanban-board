@@ -11,10 +11,10 @@ import { NOTIFICATION_STORE, NotificationType } from '#app/store/slices/notifica
  * @description Отправка запроса на создание новой канбан-доски и маппинг сообщения об ошибке с случае ошибки
  */
 export async function createBoard(name: string, description: string): Promise<Res<string, string>> {
-  const boardsStore = BOARDS_HTTP_CLIENT.get();
+  const boardsHttpClient = BOARDS_HTTP_CLIENT.get();
   const notificationStore = NOTIFICATION_STORE.get();
 
-  const createdBoard = await boardsStore.createBoard(name, description);
+  const createdBoard = await boardsHttpClient.createBoard(name, description);
 
   return createdBoard
     .map((board) => board.id)

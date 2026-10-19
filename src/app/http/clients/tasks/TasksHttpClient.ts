@@ -15,7 +15,7 @@ export interface TasksHttpClient {
    * @param dto - данные для создания задачи
    * @returns новая таска или сообщение об ошибке
    */
-  createTask(dto: CreateTaskDto): Promise<Res<Task, BackErr | HttpErr>>;
+  createTask(dto: Omit<CreateTaskDto, 'validate'>): Promise<Res<Task, BackErr | HttpErr>>;
 
   /**
    * Получение задач по определённому спринту
@@ -42,7 +42,7 @@ class TasksHttpClientImpl implements TasksHttpClient {
    * @inheritdoc
    * @see {TasksHttpClient.createTask}
    */
-  async createTask(dto: CreateTaskDto): Promise<Res<Task, BackErr | HttpErr>> {
+  async createTask(dto: Omit<CreateTaskDto, 'validate'>): Promise<Res<Task, BackErr | HttpErr>> {
     const response = await request('/api/v1/tasks', {
       method: 'POST',
       headers: ReqHeaders.default().build(),

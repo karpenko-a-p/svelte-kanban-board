@@ -1,6 +1,6 @@
 import { diContainer, err, ok, type Res } from '#app/core/common';
-import { Board } from '#app/entities';
-import { type DbBoard, DbUserBoardRole } from './db';
+import { Board, User } from '#app/entities';
+import { type DbBoard, type DbUser, DbUserBoardRole } from './db';
 import { postgres, redis, REDIS_HOUR, redisGet, redisSet } from './utils';
 
 /**
@@ -65,6 +65,13 @@ export interface BoardsRepo {
    * @returns флаг наличия доступа
    */
   checkIsMember(boardId: string, userId: string): Promise<boolean>;
+
+  /**
+   * Получение списка участников доски
+   * @param boardId - идентификатор доски
+   * @returns массив пользователей
+   */
+  getMembers(boardId: string): Promise<User[]>;
 
   /**
    * Провверка что спринт принадлежит к определенной доске
@@ -225,6 +232,31 @@ export class BoardsRepoImpl implements BoardsRepo {
     redisSet(cacheKey, REDIS_HOUR, isMember);
 
     return isMember;
+  }
+
+  /**
+   * @inheritdoc
+   * @see {BoardsRepo.getMembers}
+   */
+  async getMembers(boardId: string): Promise<User[]> {
+    const cacheKey = `users_by_board:${boardId}`;
+    const cachedVal = await redisGet<User[]>(cacheKey);
+
+    if (cachedVal !== undefined) {
+      return cachedVal?.map(User.tryParse).removeNil() ?? [];
+    }
+
+    const rows = await postgres<DbUser[]>`
+      select id, login, fio, created_at from users u
+      join boards_members bm on bm.user_id = u.id
+      where bm.board_id = ${boardId}`;
+
+    const users = rows
+      .map((user) => User.new(user.id, user.login, user.fio, user.created_at.toISOString()))
+      .removeNil();
+
+    redisSet(cacheKey, REDIS_HOUR, users);
+    return users;
   }
 
   /**

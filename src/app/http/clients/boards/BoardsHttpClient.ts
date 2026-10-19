@@ -1,5 +1,5 @@
 import { diContainer, err, ok, type Res } from '#app/core/common';
-import { Board } from '#app/entities';
+import { Board, User } from '#app/entities';
 import { InvalidEntityErrorDto, ValidationErrorDto } from '#app/http/common-dtos';
 import { BackErr, HttpErr } from '#app/http/common-errors';
 import { ReqHeaders, request } from '#app/http/utils';
@@ -25,6 +25,13 @@ export interface BoardsHttpClient {
    * @returns Список досок
    */
   getBoardsByUserId(userId: string): Promise<Res<Board[], HttpErr | BackErr>>;
+
+  /**
+   * Получение списка участников доски
+   * @param boardId - идентификатор доски
+   * @returns массив пользователей
+   */
+  getMembers(boardId: string): Promise<Res<User[], HttpErr | BackErr>>;
 }
 
 /**
@@ -82,7 +89,7 @@ class BoardsHttpClientImpl implements BoardsHttpClient {
    * @see {BoardsHttpClient.getBoardsByUserId}
    */
   async getBoardsByUserId(): Promise<Res<Board[], HttpErr | BackErr>> {
-    const response = await request('/api/v1/board', {
+    const response = await request('/api/v1/boards', {
       method: 'GET',
       headers: ReqHeaders.default().build()
     });
@@ -104,6 +111,39 @@ class BoardsHttpClientImpl implements BoardsHttpClient {
       }
 
       return ok(responseBody.map(Board.tryParse).removeNil());
+    }
+
+    // Неизвестная ошибка
+    return err(new BackErr.Server());
+  }
+
+  /**
+   * @inheritdoc
+   * @see {BoardsHttpClient.getMembers}
+   */
+  async getMembers(boardId: string): Promise<Res<User[], HttpErr | BackErr>> {
+    const response = await request(`/api/v1/boards/${boardId}/members`, {
+      method: 'GET',
+      headers: ReqHeaders.default().build()
+    });
+
+    // Ошибка сети
+    if (response.isErr()) {
+      return err(new HttpErr.Network());
+    }
+
+    const smartResponse = response.unwrap();
+
+    // Список участников доски
+    if (smartResponse.isOk) {
+      const responseBody = await smartResponse.json();
+
+      // Бэк вернул некорректный ответ
+      if (!responseBody || !Array.isArray(responseBody)) {
+        return err(new BackErr.Server());
+      }
+
+      return ok(responseBody.map(User.tryParse).removeNil());
     }
 
     // Неизвестная ошибка
