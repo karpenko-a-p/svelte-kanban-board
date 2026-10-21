@@ -1,10 +1,11 @@
 import { diContainer, err, ok, type Res } from '#app/core/common';
 import { Board, User } from '#app/entities';
-import { InvalidEntityErrorDto, ValidationErrorDto } from '#app/http/common-dtos';
+import { InvalidEntityErrorDto, NotFoundErrorDto, ValidationErrorDto } from '#app/http/common-dtos';
 import { BackErr, HttpErr } from '#app/http/common-errors';
 import { ReqHeaders, request } from '#app/http/utils';
 import { BoardDto } from './BoardDto';
 import { CreateBoardDto } from './CreateBoardDto';
+import { MemberActionDto } from './MemberActionDto';
 
 /**
  * HTTP клиент для работы с api канбан досок
@@ -32,6 +33,21 @@ export interface BoardsHttpClient {
    * @returns массив пользователей
    */
   getMembers(boardId: string): Promise<Res<User[], HttpErr | BackErr>>;
+
+  /**
+   * Добавление участника к канбан доске
+   * @param boardId - идентификатор доски
+   * @param userId - идентификатор участника (пользователя)
+   * @returns
+   */
+  addMemberToBoard(boardId: string, userId: string): Promise<Res<null, HttpErr | BackErr>>;
+
+  /**
+   * Удалить участника bp канбан доски
+   * @param boardId - идентификатор доски
+   * @param userId - идентификатор участника (пользователя)
+   */
+  removeMemberFromBoard(boardId: string, userId: string): Promise<Res<null, HttpErr | BackErr>>;
 }
 
 /**
@@ -144,6 +160,93 @@ class BoardsHttpClientImpl implements BoardsHttpClient {
       }
 
       return ok(responseBody.map(User.tryParse).removeNil());
+    }
+
+    // Неизвестная ошибка
+    return err(new BackErr.Server());
+  }
+
+  /**
+   * @inheritdoc
+   * @see {BoardsHttpClient.addMemberToBoard}
+   */
+  async addMemberToBoard(boardId: string, userId: string): Promise<Res<null, HttpErr | BackErr>> {
+    const response = await request(`/api/v1/boards/${boardId}/members`, {
+      method: 'POST',
+      headers: ReqHeaders.default().build(),
+      body: JSON.stringify(new MemberActionDto(userId))
+    });
+
+    // Ошибка сети
+    if (response.isErr()) {
+      return err(new HttpErr.Network());
+    }
+
+    const smartResponse = response.unwrap();
+
+    // Пользователь добавлен к доске
+    if (smartResponse.isOk) {
+      return ok(null);
+    }
+
+    // Пользователь не найден
+    else if (smartResponse.isNotFound && NotFoundErrorDto.isExtends(await smartResponse.json())) {
+      return err(new BackErr.NotFound());
+    }
+
+    // Передано некорректное DTO
+    else if (smartResponse.isUnprocessableEntity && InvalidEntityErrorDto.isExtends(await smartResponse.json())) {
+      return err(new BackErr.InvalidEntity());
+    }
+
+    // Ошибка валидации
+    if (smartResponse.isBadRequest) {
+      const responseDto = await smartResponse.json();
+
+      if (ValidationErrorDto.isExtends(responseDto)) {
+        return err(new BackErr.Validation(responseDto.issues));
+      }
+    }
+
+    // Неизвестная ошибка
+    return err(new BackErr.Server());
+  }
+
+  /**
+   * @inheritdoc
+   * @see {BoardsHttpClient.removeMemberFromBoard}
+   */
+  async removeMemberFromBoard(boardId: string, userId: string): Promise<Res<null, HttpErr | BackErr>> {
+    const response = await request(`/api/v1/boards/${boardId}/members`, {
+      method: 'DELETE',
+      headers: ReqHeaders.default().build(),
+      body: JSON.stringify(new MemberActionDto(userId))
+    });
+
+    // Ошибка сети
+    if (response.isErr()) {
+      return err(new HttpErr.Network());
+    }
+
+    const smartResponse = response.unwrap();
+
+    // Пользователь удален из доски
+    if (smartResponse.isOk) {
+      return ok(null);
+    }
+
+    // Передано некорректное DTO
+    else if (smartResponse.isUnprocessableEntity && InvalidEntityErrorDto.isExtends(await smartResponse.json())) {
+      return err(new BackErr.InvalidEntity());
+    }
+
+    // Ошибка валидации
+    if (smartResponse.isBadRequest) {
+      const responseDto = await smartResponse.json();
+
+      if (ValidationErrorDto.isExtends(responseDto)) {
+        return err(new BackErr.Validation(responseDto.issues));
+      }
     }
 
     // Неизвестная ошибка

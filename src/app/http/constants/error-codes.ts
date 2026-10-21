@@ -24,6 +24,11 @@ export const SERVER_ERR = 'SERVER_ERROR';
 export const BAD_REQUEST_ERR = 'BAD_REQUEST_ERR';
 
 /**
+ * Не найдено
+ */
+export const NOT_FOUND_ERR = 'NOT_FOUND_ERR';
+
+/**
  * Передана некорректная сущность
  */
 export const INVALID_ENTITY_ERR = 'INVALID_ENTITY';

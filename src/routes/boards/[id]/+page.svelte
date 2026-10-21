@@ -3,8 +3,10 @@
   import IconCheck from '@tabler/icons-svelte/icons/check';
   import IconNotebook from '@tabler/icons-svelte/icons/notebook';
   import IconPlus from '@tabler/icons-svelte/icons/plus';
+  import IconUser from '@tabler/icons-svelte/icons/user';
   import dayjs from 'dayjs';
   import { onDestroy, onMount } from 'svelte';
+  import MembersModal from '#view/components/kanban-board/MembersModal.svelte';
   import Track from '#view/components/kanban-board/Track.svelte';
   import CreateSprintModal from '#view/components/sprints/CreateSprintModal.svelte';
   import CreateTaskModal from '#view/components/taskts/CreateTaskModal.svelte';
@@ -13,7 +15,7 @@
   import { BOARD_MEMBERS_STORE } from '#app/store/slices/boards';
   import { SPRINTS_STORE } from '#app/store/slices/sprints';
   import { TASKS_STORE } from '#app/store/slices/tasks';
-  import { getBoardMembers } from '#app/use-cases/boards';
+  import { addMemberToBoard, getBoardMembers, removeMemberFromBoard } from '#app/use-cases/boards';
   import { createSprint, fetchSprints } from '#app/use-cases/sprints';
   import { createTask, fetchTasks, updateTaskStatus } from '#app/use-cases/tasks';
   import { browser } from '$app/env';
@@ -27,6 +29,7 @@
   const { data }: PageProps = $props();
   let sprintCreation = $state(false);
   let taskCreation = $state(false);
+  let members = $state(false);
   let currentSprintId = $state('');
   const board = $derived(data.board);
   const user = $derived(page.data.user)!;
@@ -82,11 +85,33 @@
     return err(createdTask.unwrapErr());
   }
 
+  // Сценарий добавления учистника в доску
+  async function addMemberScenario(userId: string): Promise<Res<null, string[]>> {
+    const addResult = await addMemberToBoard(userId, board.id);
+
+    if (addResult.isErr()) {
+      return err(addResult.unwrapErr());
+    }
+
+    return getBoardMembers(board.id).then(() => ok(null));
+  }
+
+  // Сценарий удаления учистника из доски
+  async function removeMemberScenario(userId: string): Promise<void> {
+    removeMemberFromBoard(userId, board.id);
+  }
+
   // Выбор спринта и запрос актуальных тасок
   function selectSprint(sprintId: string): void {
     currentSprintId = sprintId;
     fetchTasks(board.id, sprintId);
   }
+
+  // Пуллинг задач
+  $effect(() => {
+    const intervalId = setInterval(() => currentSprintId && fetchTasks(board.id, currentSprintId), 10_000);
+    return (): void => clearInterval(intervalId);
+  });
 
   // Получение списка спринтов, задач, участников для открытой канбан доски
   onMount(async () => {
@@ -109,6 +134,7 @@
 <!-- eslint-disable @typescript-eslint/explicit-function-return-type -->
 
 <section class="px-2 grow flex flex-col">
+  <a href="/boards">К списку досок</a>
   <h1>{board?.name}</h1>
   <p class="secondary">{board?.description}</p>
 
@@ -155,6 +181,11 @@
               <IconPlus />
               Добавить задачу
             </button>
+
+            <button class="ghost" onclick={() => (members = true)}>
+              <IconUser />
+              Участники
+            </button>
           </header>
 
           <!-- Список задач -->
@@ -186,7 +217,7 @@
                   class="small secondary py-1 text-xs"
                   onclick={() => updateTaskStatus(board.id, taskId, TaskStatus.Done)}
                 >
-                  Выполнено
+                  Завершить
                 </button>
               {/snippet}
             </Track>
@@ -216,4 +247,9 @@
 <!-- Окно создания новой задачи  -->
 {#if browser && taskCreation}
   <CreateTaskModal onsubmit={createTaskScenario} bind:opened={taskCreation} />
+{/if}
+
+<!-- Окно создания новой задачи  -->
+{#if browser && members}
+  <MembersModal onsubmit={addMemberScenario} ondelete={removeMemberScenario} bind:opened={members} />
 {/if}

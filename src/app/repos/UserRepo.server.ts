@@ -19,8 +19,16 @@ export interface UserRepo {
   /**
    * Проверка существования пользователя по логину
    * @param login - логин пользователя
+   * @returns признак существования
    */
   checkUserExistsByLogin(login: string): Promise<boolean>;
+
+  /**
+   * Проверка существования пользователя по идентификатору
+   * @param id - идентификатор пользователя
+   * @returns признак существования
+   */
+  checkUserExistsById(id: string): Promise<boolean>;
 
   /**
    * Получение пользователя по идентификатору
@@ -47,6 +55,7 @@ export interface UserRepo {
 class UserRepoImpl implements UserRepo {
   /**
    * @inheritDoc
+   * @see {UserRepo.createUser}
    */
   async createUser(login: string, fio: string, password: string): Promise<Res<User, string>> {
     const [row] = await postgres<DbUser[]>`
@@ -67,11 +76,11 @@ class UserRepoImpl implements UserRepo {
 
   /**
    * @inheritDoc
+   * @see {UserRepo.checkUserExistsByLogin}
    */
   async checkUserExistsByLogin(login: string): Promise<boolean> {
     const [row = null] = await postgres<[{ exists: boolean }]>`
-      select 1::bool as exists
-      from users
+      select 1::bool as exists from users
       where login = ${login}
       limit 1`;
 
@@ -80,6 +89,20 @@ class UserRepoImpl implements UserRepo {
 
   /**
    * @inheritDoc
+   * @see {UserRepo.checkUserExistsById}
+   */
+  async checkUserExistsById(id: string): Promise<boolean> {
+    const [row = null] = await postgres<[{ exists: boolean }]>`
+      select 1::bool as exists from users
+      where id = ${id}
+      limit 1`;
+
+    return !!row?.exists;
+  }
+
+  /**
+   * @inheritDoc
+   * @see {UserRepo.getUserById}
    */
   async getUserById(id: string): Promise<Maybe<User>> {
     const cacheKey = `user:${id}`;
@@ -103,6 +126,7 @@ class UserRepoImpl implements UserRepo {
 
   /**
    * @inheritDoc
+   * @see {UserRepo.getUserByLogin}
    */
   async getUserByLogin(login: string): Promise<Maybe<User>> {
     const [row = null] = await postgres<[DbUser]>`
@@ -120,6 +144,7 @@ class UserRepoImpl implements UserRepo {
 
   /**
    * @inheritDoc
+   * @see {UserRepo.getUserPasswordByLogin}
    */
   async getUserPasswordByLogin(login: string): Promise<Maybe<string>> {
     const [row = null] = await postgres<[DbUser]>`

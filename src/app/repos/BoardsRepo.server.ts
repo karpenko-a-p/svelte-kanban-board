@@ -189,7 +189,7 @@ export class BoardsRepoImpl implements BoardsRepo {
       insert into boards_members (board_id, user_id, user_role)
       values (${boardId}, ${memberId}, ${dbRole})`;
 
-    redis.del(`boards_by_user:${memberId}`);
+    redis.del(`boards_by_user:${memberId}`, `users_by_board:${boardId}`, `board:${boardId}_has_user:${memberId}`);
   }
 
   /**
@@ -211,10 +211,10 @@ export class BoardsRepoImpl implements BoardsRepo {
         join boards b on s.board_id = b.id
         where t.sprint_id = s.id
         and t.assigned_id = ${userId}
-        and b.board_id = ${boardId} `;
+        and b.id = ${boardId} `;
     });
 
-    redis.del(`boards_by_user:${userId}`);
+    redis.del(`boards_by_user:${userId}`, `board:${boardId}_has_user:${userId}`);
   }
 
   /**

@@ -26,7 +26,12 @@
     {#each tasks as task (task.id)}
       <li class="bg-white p-2 rounded-md shadow-black flex flex-col gap-1.5">
         <!-- Параметы ззадачи -->
-        <p class="small secondary">[ {task.id} ] {task.assigned}</p>
+        <p class="small secondary">
+          [ID {task.id}] {task.assigned}
+          <br />
+          <span class="text-xs">От {task.reporter}</span>
+        </p>
+
         <p class="font-bold">{task.name}</p>
 
         {#if task.description}

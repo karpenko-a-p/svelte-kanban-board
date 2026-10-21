@@ -23,6 +23,12 @@ export interface BoardMembers extends Clearable {
    * @param member - добавляемый участник
    */
   addMember(member: User): void;
+
+  /**
+   * Удаление участника из списка участников спринта
+   * @param member - удаляемый участник
+   */
+  removeMember(memberId: string): void;
 }
 
 /**
@@ -56,6 +62,14 @@ class BoardMembersImpl implements BoardMembers {
    */
   addMember(member: User): void {
     this.members.push(member);
+  }
+
+  /**
+   * @inheritdoc
+   * @see {BoardMembers.removeMember}
+   */
+  removeMember(memberId: string): void {
+    this.members = this.members.filter((member) => member.id !== memberId);
   }
 
   /**

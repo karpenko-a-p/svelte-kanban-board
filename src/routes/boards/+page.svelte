@@ -46,6 +46,7 @@
 
     await createBoard(name.value, description.value);
     refreshAll();
+    creation = false;
   }
 </script>
 
@@ -69,6 +70,11 @@
         </li>
       {/each}
     </ul>
+
+    <button onclick={openCreation} class="self-start mt-4">
+      <IconPlus />
+      Создать
+    </button>
   {:else}
     <div class="flex flex-col grow items-center justify-center">
       <h4 class="mb-2">Вы не состоите ни в одной из досок</h4>

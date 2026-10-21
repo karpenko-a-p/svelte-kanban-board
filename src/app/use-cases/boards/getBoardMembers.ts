@@ -5,6 +5,7 @@ import { NOTIFICATION_STORE, NotificationType } from '#app/store/slices/notifica
 /**
  * Получение списка участников канбан доски
  * @param boardId - идентификатор канбан доски
+ * @description Получение пользователей-участников и добавление их в хранилище
  */
 export async function getBoardMembers(boardId: string): Promise<void> {
   const boardsHttpClient = BOARDS_HTTP_CLIENT.get();

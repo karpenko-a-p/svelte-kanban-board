@@ -5,3 +5,4 @@ export * from './ServerErrorDto';
 export * from './InvalidEntityErrorDto';
 export * from './UnauthorizedErrorDto';
 export * from './ForbiddenErrorDto';
+export * from './NotFoundErrorDto';
