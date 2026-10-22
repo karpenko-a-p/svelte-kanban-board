@@ -1,6 +1,6 @@
+import { SignJWT, jwtVerify } from 'jose';
 import { diContainer, isString } from '#app/core/common';
 import { JWT_SECRET } from '#app/core/server';
-import { SignJWT, jwtVerify } from 'jose';
 
 /**
  * Сервис для работы с JWT токеном

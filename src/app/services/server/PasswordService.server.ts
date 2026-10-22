@@ -1,5 +1,5 @@
-import { diContainer } from '#app/core/common';
 import { password } from 'bun';
+import { diContainer } from '#app/core/common';
 
 /**
  * Сервис для работы с паролями

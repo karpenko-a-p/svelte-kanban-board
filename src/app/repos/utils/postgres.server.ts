@@ -1,5 +1,5 @@
-import { DATABASE_URL } from '#app/core/server';
 import { SQL } from 'bun';
+import { DATABASE_URL } from '#app/core/server';
 
 /**
  * Адаптер для работы с postgres

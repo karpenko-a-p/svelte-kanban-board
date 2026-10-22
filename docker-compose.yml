@@ -1,27 +1,29 @@
 services:
   postgres:
-    image: postgres:17.5-alpine3.22
+    image: postgres:18.4-alpine3.24
     container_name: postgres-database
     restart: unless-stopped
     networks:
       - local
+    ports:
+      - '5432:5432'
     volumes:
       - database-storage:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: admin
-      POSTGRES_DB: main
+      POSTGRES_DB: my_database
       PGDATA: /var/lib/postgresql/data/pgdata
-      PGTZ: Europe/Moscow
-      TZ: Europe/Moscow
+      PGTZ: 'UTC'
+      TZ: 'UTC'
     healthcheck:
-      test: pg_isready -U admin -d database
-      interval: 15s
+      test: pg_isready -U admin -d my_database
+      interval: 10s
       timeout: 10s
       retries: 3
 
   migrations:
-    image: amacneil/dbmate:2.29.5
+    image: amacneil/dbmate:2.35.0
     container_name: dbmate-migrations
     restart: no
     networks:
@@ -36,14 +38,16 @@ services:
     command: --wait up
 
   redis:
-    image: redis:7.4.7-alpine3.21
+    image: redis:8.6-alpine3.23
     container_name: redis-cache
     restart: unless-stopped
+    ports:
+      - "6379:6379"
     networks:
       - local
     healthcheck:
       test: redis-cli ping
-      interval: 15s
+      interval: 10s
       timeout: 10s
       retries: 3
 
@@ -66,31 +70,15 @@ services:
       - ./logs.db:/app/logs.db
       - ./media-storage:/app/media-storage
     environment:
-      # Token Service
       JWT_SECRET: my-super-puper-duper-secret-key-for-my-jwt-token
-      # Storage Service
-      MAX_IMAGE_SIZE_IN_BYTES: 1048576 #1Mb
-      MAX_VIDEO_SIZE_IN_BYTES: 52428800 #50Mb
-      # File Service
-      MAX_IMAGE_CORNER_IN_PX: 6124 #pixels
-      MIN_IMAGE_CORNER_IN_PX: 400 #pixels
-      MAX_IMAGE_PREFERRED_CORNER_IN_PX: 1200 #pixels
-      MIN_MINIFIED_IMAGE_PREFERRED_CORNER_IN_PX: 300 #pixels
-      MAX_IMAGE_RATION: 2.5 #ration
-      IMAGE_QUALITY: 85 #percent
-      # Scheduler
-      ENABLE_SCHEDULING: true
-      # Connection strings
+      DATABASE_URL: postgresql://admin:password@postgres:5432/my_database?sslmode=disable
       REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgresql://admin:password@postgres:5432/main?sslmode=disable
-      SQLITE_URL: sqlite://logs.db
-      # Internal system
       BODY_SIZE_LIMIT: 51M
       PORT: 3000
       TZ: Europe/Moscow
     healthcheck:
       test: wget -q --spider http://127.0.0.1:3000/api/v1/health
-      interval: 15s
+      interval: 10s
       timeout: 10s
       retries: 3
 
@@ -106,12 +94,11 @@ services:
     networks:
       - local
     volumes:
-      - ./media-storage:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./certs:/etc/nginx/ssl:ro
     healthcheck:
       test: wget --no-check-certificate -q --spider https://127.0.0.1/health
-      interval: 15s
+      interval: 5s
       timeout: 10s
       retries: 3
 
@@ -128,8 +115,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       AUTOHEAL_CONTAINER_LABEL: all
-      AUTOHEAL_INTERVAL: 30
-      AUTOHEAL_START_PERIOD: 60
+      AUTOHEAL_INTERVAL: 15
+      AUTOHEAL_START_PERIOD: 30
       AUTOHEAL_DEFAULT_STOP_TIMEOUT: 10
       CURL_TIMEOUT: 30
 

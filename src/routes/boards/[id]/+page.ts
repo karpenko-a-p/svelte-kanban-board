@@ -2,6 +2,8 @@ import { error } from '@sveltejs/kit';
 import { Board } from '#app/entities';
 import type { PageLoad } from '#svelte-kit/boards/[id]/$types';
 
+export const ssr = false;
+
 /**
  * Преобраазование данных для отображения страницы
  * @returns канбан доска

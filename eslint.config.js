@@ -14,7 +14,7 @@ export default defineConfig(
   prettier,
   ...svelte.configs.prettier,
   {
-    ignores: ['dist/', 'build/', 'node_modules/', 'coverage/', '*.min.js']
+    ignores: ['dist/', 'build/', 'node_modules/', 'coverage/', '.svelte-kit/', '.storybook/' , '*.min.js']
   },
   {
     languageOptions: {
